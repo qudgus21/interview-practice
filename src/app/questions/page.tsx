@@ -75,43 +75,76 @@ export default function QuestionsPage() {
         </div>
 
         {isAdding && (
-          <div className="mb-4 p-4 border rounded-md">
-            <input
-              type="text"
-              placeholder="질문"
-              className="w-full mb-2 p-2 border rounded"
-              value={newQuestion.question}
-              onChange={(e) =>
-                setNewQuestion({ ...newQuestion, question: e.target.value })
-              }
-            />
-            <textarea
-              placeholder="답변"
-              className="w-full mb-2 p-2 border rounded"
-              value={newQuestion.answer}
-              onChange={(e) =>
-                setNewQuestion({ ...newQuestion, answer: e.target.value })
-              }
-            />
-            <select
-              className="w-full mb-2 p-2 border rounded"
-              value={newQuestion.priority}
-              onChange={(e) =>
-                setNewQuestion({
-                  ...newQuestion,
-                  priority: e.target.value as Priority,
-                })
-              }
-            >
-              <option value="high">높음</option>
-              <option value="medium">보통</option>
-              <option value="low">낮음</option>
-            </select>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsAdding(false)}>
-                취소
-              </Button>
-              <Button onClick={addQuestion}>저장</Button>
+          <div className="mb-4 p-6 border rounded-lg bg-white shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">새 질문 추가</h3>
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="question"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  질문
+                </label>
+                <input
+                  id="question"
+                  type="text"
+                  placeholder="면접 질문을 입력하세요"
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                  value={newQuestion.question}
+                  onChange={(e) =>
+                    setNewQuestion({ ...newQuestion, question: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="answer"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  답변
+                </label>
+                <textarea
+                  id="answer"
+                  placeholder="모범 답안을 입력하세요"
+                  className="w-full p-2 border rounded-md h-32 resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                  value={newQuestion.answer}
+                  onChange={(e) =>
+                    setNewQuestion({ ...newQuestion, answer: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="priority"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  중요도
+                </label>
+                <select
+                  id="priority"
+                  className="w-full p-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                  value={newQuestion.priority}
+                  onChange={(e) =>
+                    setNewQuestion({
+                      ...newQuestion,
+                      priority: e.target.value as Priority,
+                    })
+                  }
+                >
+                  <option value="high">높음</option>
+                  <option value="medium">보통</option>
+                  <option value="low">낮음</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button variant="outline" onClick={() => setIsAdding(false)}>
+                  취소
+                </Button>
+                <Button onClick={addQuestion}>저장</Button>
+              </div>
             </div>
           </div>
         )}
