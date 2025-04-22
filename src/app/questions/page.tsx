@@ -241,39 +241,36 @@ export default function QuestionsPage() {
           </div>
         </Modal>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-4 gap-4">
           {filteredQuestions.map((q) => (
             <div
               key={q.id}
-              className="p-6 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+              className="p-4 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer h-[180px] flex flex-col"
               onClick={() => handleEditQuestion(q)}
             >
-              <div className="flex justify-between items-start">
-                <div className="space-y-3 flex-1">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      {q.question}
-                    </h3>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        q.priority === "high"
-                          ? "bg-red-100 text-red-800"
-                          : q.priority === "medium"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {q.priority === "high"
-                        ? "높음"
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      q.priority === "high"
+                        ? "bg-red-100 text-red-800"
                         : q.priority === "medium"
-                        ? "보통"
-                        : "낮음"}
-                    </span>
-                  </div>
-                  <p className="text-gray-700 whitespace-pre-line leading-relaxed">
-                    {q.answer}
-                  </p>
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-green-100 text-green-800"
+                    }`}
+                  >
+                    {q.priority === "high"
+                      ? "높음"
+                      : q.priority === "medium"
+                      ? "보통"
+                      : "낮음"}
+                  </span>
                 </div>
+                <h3 className="text-base font-semibold text-gray-800 break-words whitespace-normal min-h-[3rem] line-clamp-2">
+                  {q.question}
+                </h3>
+              </div>
+              <div className="flex justify-end mt-2">
                 <Button
                   variant="ghost"
                   size="icon"
