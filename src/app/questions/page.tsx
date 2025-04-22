@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { InterviewQuestion, Priority } from "@/types/interview";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Edit2 } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { Modal } from "@/components/ui/modal";
 
@@ -17,6 +17,10 @@ export default function QuestionsPage() {
     question: "",
     answer: "",
     priority: "medium" as Priority,
+  });
+  const [errors, setErrors] = useState({
+    question: "",
+    answer: "",
   });
 
   useEffect(() => {
@@ -41,11 +45,27 @@ export default function QuestionsPage() {
     setIsModalOpen(true);
   };
 
+  const validateForm = () => {
+    const newErrors = {
+      question: "",
+      answer: "",
+    };
+
+    if (!formData.question.trim()) {
+      newErrors.question = "질문을 입력해주세요";
+    }
+    if (!formData.answer.trim()) {
+      newErrors.answer = "답변을 입력해주세요";
+    }
+
+    setErrors(newErrors);
+    return !newErrors.question && !newErrors.answer;
+  };
+
   const handleSaveQuestion = () => {
-    if (!formData.question || !formData.answer) return;
+    if (!validateForm()) return;
 
     if (editingQuestion) {
-      // 수정 모드
       const updatedQuestions = questions.map((q) =>
         q.id === editingQuestion.id
           ? {
@@ -58,7 +78,6 @@ export default function QuestionsPage() {
       );
       saveQuestions(updatedQuestions);
     } else {
-      // 추가 모드
       const question: InterviewQuestion = {
         id: Date.now().toString(),
         ...formData,
@@ -69,6 +88,7 @@ export default function QuestionsPage() {
 
     setFormData({ question: "", answer: "", priority: "medium" });
     setEditingQuestion(null);
+    setErrors({ question: "", answer: "" });
     setIsModalOpen(false);
   };
 
@@ -76,6 +96,7 @@ export default function QuestionsPage() {
     setIsModalOpen(false);
     setEditingQuestion(null);
     setFormData({ question: "", answer: "", priority: "medium" });
+    setErrors({ question: "", answer: "" });
   };
 
   const deleteQuestion = (id: string) => {
@@ -87,18 +108,26 @@ export default function QuestionsPage() {
   );
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 max-w-4xl">
       <Navigation />
       <div className="mt-16">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">면접 질문 관리</h1>
-          <div className="flex gap-2">
-            <Button onClick={() => setIsModalOpen(true)}>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              면접 질문 관리
+            </h1>
+            <p className="text-gray-700">면접 준비를 위한 질문을 관리하세요</p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+            >
               <Plus className="mr-2 h-4 w-4" />
               질문 추가
             </Button>
             <select
-              className="border rounded-md px-3 py-2"
+              className="border border-gray-300 rounded-lg px-4 py-2 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
               value={filter}
               onChange={(e) => setFilter(e.target.value as Priority | "all")}
             >
@@ -114,12 +143,13 @@ export default function QuestionsPage() {
           isOpen={isModalOpen}
           onClose={handleModalClose}
           title={editingQuestion ? "질문 수정" : "새 질문 추가"}
+          className="max-w-4xl"
         >
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
               <label
                 htmlFor="question"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-800 mb-2"
               >
                 질문
               </label>
@@ -127,42 +157,58 @@ export default function QuestionsPage() {
                 id="question"
                 type="text"
                 placeholder="면접 질문을 입력하세요"
-                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                className={`w-full p-3 border rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                  errors.question ? "border-red-500" : "border-gray-300"
+                }`}
                 value={formData.question}
-                onChange={(e) =>
-                  setFormData({ ...formData, question: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, question: e.target.value });
+                  if (errors.question) {
+                    setErrors({ ...errors, question: "" });
+                  }
+                }}
               />
+              {errors.question && (
+                <p className="mt-1 text-sm text-red-500">{errors.question}</p>
+              )}
             </div>
 
             <div>
               <label
                 htmlFor="answer"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-800 mb-2"
               >
                 답변
               </label>
               <textarea
                 id="answer"
                 placeholder="모범 답안을 입력하세요"
-                className="w-full p-2 border rounded-md h-32 resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                className={`w-full p-3 border rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors h-96 resize-none ${
+                  errors.answer ? "border-red-500" : "border-gray-300"
+                }`}
                 value={formData.answer}
-                onChange={(e) =>
-                  setFormData({ ...formData, answer: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, answer: e.target.value });
+                  if (errors.answer) {
+                    setErrors({ ...errors, answer: "" });
+                  }
+                }}
               />
+              {errors.answer && (
+                <p className="mt-1 text-sm text-red-500">{errors.answer}</p>
+              )}
             </div>
 
             <div>
               <label
                 htmlFor="priority"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-800 mb-2"
               >
                 중요도
               </label>
               <select
                 id="priority"
-                className="w-full p-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50"
+                className="w-full p-3 border border-gray-300 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 value={formData.priority}
                 onChange={(e) =>
                   setFormData({
@@ -177,11 +223,18 @@ export default function QuestionsPage() {
               </select>
             </div>
 
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={handleModalClose}>
+            <div className="flex justify-end gap-3 pt-6">
+              <Button
+                variant="outline"
+                onClick={handleModalClose}
+                className="border-gray-300 hover:bg-gray-50 text-gray-800"
+              >
                 취소
               </Button>
-              <Button onClick={handleSaveQuestion}>
+              <Button
+                onClick={handleSaveQuestion}
+                className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+              >
                 {editingQuestion ? "수정" : "저장"}
               </Button>
             </div>
@@ -192,43 +245,46 @@ export default function QuestionsPage() {
           {filteredQuestions.map((q) => (
             <div
               key={q.id}
-              className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              className="p-6 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
               onClick={() => handleEditQuestion(q)}
             >
               <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <h3 className="text-lg font-semibold">{q.question}</h3>
-                  <p className="text-gray-600 whitespace-pre-line">
+                <div className="space-y-3 flex-1">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      {q.question}
+                    </h3>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        q.priority === "high"
+                          ? "bg-red-100 text-red-800"
+                          : q.priority === "medium"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {q.priority === "high"
+                        ? "높음"
+                        : q.priority === "medium"
+                        ? "보통"
+                        : "낮음"}
+                    </span>
+                  </div>
+                  <p className="text-gray-700 whitespace-pre-line leading-relaxed">
                     {q.answer}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      q.priority === "high"
-                        ? "bg-red-100 text-red-800"
-                        : q.priority === "medium"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-green-100 text-green-800"
-                    }`}
-                  >
-                    {q.priority === "high"
-                      ? "높음"
-                      : q.priority === "medium"
-                      ? "보통"
-                      : "낮음"}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteQuestion(q.id);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-600 hover:text-red-600 hover:bg-red-50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteQuestion(q.id);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           ))}
