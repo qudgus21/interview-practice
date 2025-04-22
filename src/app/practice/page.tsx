@@ -1,146 +1,85 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { InterviewQuestion } from "@/types/interview";
-import { Mic, MicOff, Play, Pause, SkipForward } from "lucide-react";
 import { Navigation } from "@/components/navigation";
+import { Mic, MicOff, RotateCcw, Pause, Play } from "lucide-react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 
 export default function PracticePage() {
-  const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
-  const [currentQuestion, setCurrentQuestion] =
-    useState<InterviewQuestion | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [timer, setTimer] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [micPermissionError, setMicPermissionError] = useState<string | null>(
-    null
-  );
-  const timerRef = useRef<NodeJS.Timeout>();
-  const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState("");
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const {
     transcript,
     listening,
     resetTranscript,
     browserSupportsSpeechRecognition,
-  } = useSpeechRecognition({
-    clearTranscriptOnListen: false,
-  });
+  } = useSpeechRecognition();
 
   useEffect(() => {
     const savedQuestions = localStorage.getItem("interviewQuestions");
     if (savedQuestions) {
-      setQuestions(JSON.parse(savedQuestions));
+      const parsedQuestions = JSON.parse(savedQuestions);
+      setQuestions(parsedQuestions.map((q: any) => q.question));
     }
-    speechSynthesisRef.current = window.speechSynthesis;
-
-    // 브라우저 지원 여부 확인
-    if (!browserSupportsSpeechRecognition) {
-      setMicPermissionError(
-        "이 브라우저는 음성 인식을 지원하지 않습니다. Chrome 브라우저를 사용해주세요."
-      );
-    }
-  }, [browserSupportsSpeechRecognition]);
+  }, []);
 
   useEffect(() => {
-    if (isTimerRunning) {
-      timerRef.current = setInterval(() => {
+    let interval: NodeJS.Timeout;
+    if (isRecording && !isPaused) {
+      interval = setInterval(() => {
         setTimer((prev) => prev + 1);
       }, 1000);
-    } else {
-      clearInterval(timerRef.current);
     }
+    return () => clearInterval(interval);
+  }, [isRecording, isPaused]);
 
-    return () => clearInterval(timerRef.current);
-  }, [isTimerRunning]);
-
-  const speakQuestion = (text: string) => {
-    if (speechSynthesisRef.current) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "ko-KR";
-      speechSynthesisRef.current.speak(utterance);
+  useEffect(() => {
+    if (questions.length > 0) {
+      setCurrentQuestion(questions[currentIndex]);
     }
-  };
+  }, [questions, currentIndex]);
 
-  const getRandomQuestion = () => {
-    const weights = {
-      high: 0.6,
-      medium: 0.3,
-      low: 0.1,
-    };
-
-    const totalWeight = questions.reduce(
-      (sum, q) => sum + weights[q.priority],
-      0
-    );
-    let random = Math.random() * totalWeight;
-
-    for (const question of questions) {
-      random -= weights[question.priority];
-      if (random <= 0) {
-        return question;
-      }
-    }
-
-    return questions[0];
-  };
-
-  const startPractice = () => {
-    const question = getRandomQuestion();
-    setCurrentQuestion(question);
-    setTimer(0);
-    setIsTimerRunning(true);
-    speakQuestion(question.question);
-  };
-
-  const stopPractice = () => {
-    setIsTimerRunning(false);
-    setTimer(0);
-    if (speechSynthesisRef.current) {
-      speechSynthesisRef.current.cancel();
-    }
-  };
-
-  const nextQuestion = () => {
-    const question = getRandomQuestion();
-    setCurrentQuestion(question);
-    setTimer(0);
-    resetTranscript();
-    speakQuestion(question.question);
-  };
-
-  const startRecording = async () => {
-    try {
-      // 마이크 권한 요청
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop()); // 권한 확인 후 스트림 종료
-
-      setMicPermissionError(null);
-      if (typeof SpeechRecognition.startListening === "function") {
-        await SpeechRecognition.startListening({
-          continuous: true,
-          language: "ko-KR",
-        });
-        setIsRecording(true);
-      }
-    } catch (error) {
-      console.error("Error accessing microphone:", error);
-      setMicPermissionError(
-        "마이크 사용 권한이 필요합니다. 브라우저의 권한 설정을 확인해주세요."
-      );
-      setIsRecording(false);
-    }
+  const startRecording = () => {
+    setIsRecording(true);
+    setIsPaused(false);
+    SpeechRecognition.startListening({ continuous: true });
   };
 
   const stopRecording = () => {
-    if (typeof SpeechRecognition.stopListening === "function") {
+    setIsRecording(false);
+    setIsPaused(false);
+    SpeechRecognition.stopListening();
+  };
+
+  const togglePause = () => {
+    if (isPaused) {
+      SpeechRecognition.startListening({ continuous: true });
+    } else {
       SpeechRecognition.stopListening();
     }
+    setIsPaused(!isPaused);
+  };
+
+  const resetPractice = () => {
+    setTimer(0);
+    resetTranscript();
     setIsRecording(false);
+    setIsPaused(false);
+  };
+
+  const nextQuestion = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      resetPractice();
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -151,84 +90,117 @@ export default function PracticePage() {
       .padStart(2, "0")}`;
   };
 
-  return (
-    <div className="container mx-auto p-4">
-      <Navigation />
-      <div className="mt-16">
-        <h1 className="text-2xl font-bold mb-4">면접 연습</h1>
-
-        {micPermissionError && (
-          <div className="mb-4 p-4 border rounded-md bg-red-50 text-red-700">
-            {micPermissionError}
+  if (!browserSupportsSpeechRecognition) {
+    return (
+      <div className="min-h-screen bg-[#FDF8F3]">
+        <Navigation />
+        <div className="container mx-auto p-4 max-w-4xl">
+          <div className="mt-16 text-center">
+            <h1 className="text-2xl font-bold text-[#2C3639] mb-4">
+              브라우저가 음성 인식을 지원하지 않습니다.
+            </h1>
+            <p className="text-[#5C6B73]">
+              Chrome, Edge, Safari 등의 최신 브라우저를 사용해주세요.
+            </p>
           </div>
-        )}
+        </div>
+      </div>
+    );
+  }
 
-        {!currentQuestion ? (
-          <Button onClick={startPractice} className="w-full">
-            연습 시작
-          </Button>
-        ) : (
-          <div className="space-y-4">
-            <div className="p-4 border rounded-md">
-              <h2 className="text-xl font-semibold mb-2">
-                {currentQuestion.question}
-              </h2>
-              <p className="text-gray-600">{currentQuestion.answer}</p>
+  return (
+    <div className="min-h-screen bg-[#FDF8F3]">
+      <Navigation />
+      <div className="container mx-auto p-4 max-w-4xl">
+        <div className="mt-16">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-[#2C3639] mb-2">
+                실전 면접 연습
+              </h1>
+              <p className="text-[#5C6B73]">
+                음성 인식을 활용한 실전 면접 연습을 시작하세요
+              </p>
             </div>
+            <div className="text-3xl font-bold text-[#2C3639]">
+              {formatTime(timer)}
+            </div>
+          </div>
 
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-mono">{formatTime(timer)}</div>
-              <div className="flex gap-2">
-                {isTimerRunning ? (
-                  <Button variant="outline" onClick={stopPractice}>
-                    <Pause className="mr-2 h-4 w-4" />
-                    일시정지
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsTimerRunning(true)}
-                  >
-                    <Play className="mr-2 h-4 w-4" />
-                    재개
-                  </Button>
-                )}
-                <Button onClick={nextQuestion}>
-                  <SkipForward className="mr-2 h-4 w-4" />
-                  다음 질문
-                </Button>
+          <div className="bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 mb-6">
+            <h2 className="text-xl font-semibold text-[#2C3639] mb-4">
+              현재 질문
+            </h2>
+            <p className="text-lg text-[#5C6B73] mb-6">{currentQuestion}</p>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-[#5C6B73]">
+                {currentIndex + 1} / {questions.length}
               </div>
+              <Button
+                onClick={nextQuestion}
+                className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
+                disabled={currentIndex >= questions.length - 1}
+              >
+                다음 질문
+              </Button>
             </div>
+          </div>
 
-            <div className="flex flex-col items-center gap-4">
-              {isRecording ? (
-                <Button variant="destructive" onClick={stopRecording}>
-                  <MicOff className="mr-2 h-4 w-4" />
-                  녹음 중지
+          <div className="bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 mb-6">
+            <h2 className="text-xl font-semibold text-[#2C3639] mb-4">
+              답변 내용
+            </h2>
+            <div className="min-h-[200px] p-4 bg-[#FDF8F3] rounded-lg border border-[#DED0C3] mb-4">
+              <p className="text-[#5C6B73] whitespace-pre-line">
+                {transcript || "음성 인식 결과가 여기에 표시됩니다."}
+              </p>
+            </div>
+            <div className="flex justify-center gap-4">
+              {!isRecording ? (
+                <Button
+                  onClick={startRecording}
+                  className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
+                >
+                  <Mic className="mr-2 h-4 w-4" />
+                  녹음 시작
                 </Button>
               ) : (
-                <Button onClick={startRecording}>
-                  <Mic className="mr-2 h-4 w-4" />
-                  답변하기
-                </Button>
+                <>
+                  <Button
+                    onClick={togglePause}
+                    className="bg-white text-[#2C3639] border border-[#DED0C3] hover:bg-[#FDF8F3]"
+                  >
+                    {isPaused ? (
+                      <>
+                        <Play className="mr-2 h-4 w-4" />
+                        재개
+                      </>
+                    ) : (
+                      <>
+                        <Pause className="mr-2 h-4 w-4" />
+                        일시 정지
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={stopRecording}
+                    className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
+                  >
+                    <MicOff className="mr-2 h-4 w-4" />
+                    녹음 중지
+                  </Button>
+                </>
               )}
-
-              <div className="w-full p-4 border rounded-md bg-gray-50">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">내 답변:</h3>
-                  {listening && (
-                    <span className="text-sm text-green-600">
-                      음성 인식 중...
-                    </span>
-                  )}
-                </div>
-                <p className="text-gray-700 whitespace-pre-wrap min-h-[100px]">
-                  {transcript || "여기에 답변이 표시됩니다."}
-                </p>
-              </div>
+              <Button
+                onClick={resetPractice}
+                className="bg-white text-[#2C3639] border border-[#DED0C3] hover:bg-[#FDF8F3]"
+              >
+                <RotateCcw className="mr-2 h-4 w-4" />
+                초기화
+              </Button>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
