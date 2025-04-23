@@ -36,7 +36,7 @@ export function CustomSelect({
   return (
     <div className="relative" ref={selectRef}>
       <div
-        className="flex items-center justify-between border border-[#DED0C3] rounded-lg px-4 py-2 bg-white text-[#2C3639] cursor-pointer hover:border-[#E8AA9B] transition-colors"
+        className="flex items-center justify-between border border-[#DED0C3] rounded-lg px-4 py-2 bg-white text-[#2C3639] cursor-pointer hover:border-[#E8AA9B] transition-colors min-w-[126px]"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="text-sm">
