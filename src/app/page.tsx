@@ -20,7 +20,7 @@ export default function Home() {
           <p className="text-lg md:text-xl text-[#5C6B73] leading-relaxed px-4">
             체계적인 면접 준비와 효과적인 연습을 통해
             <br className="hidden md:block" />
-            당신의 면접 성공률을 높여보세요
+            면접 성공률을 높여보세요
           </p>
           <div className="flex flex-col md:flex-row justify-center gap-4 pt-4">
             <Link href="/questions">
