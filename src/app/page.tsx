@@ -100,7 +100,7 @@ export default function Home() {
                 피드백
               </h3>
             </div>
-            <ul className="space-y-3 text-sm md:text-base text-[#5C6B73] flex flex-col items-center">
+            <ul className="space-y-3 text-sm md:text-base text-[#5C6B73] flex flex-col items-center pl-[70px]">
               <li className="flex items-center w-44 md:w-48">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#7AB55C] mr-2.5"></div>
                 답변 내용 분석
