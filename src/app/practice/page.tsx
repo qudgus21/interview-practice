@@ -31,6 +31,7 @@ export default function PracticePage() {
   const [categories, setCategories] = useState<string[]>([]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  const [allQuestions, setAllQuestions] = useState<InterviewQuestion[]>([]);
 
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
@@ -41,6 +42,7 @@ export default function PracticePage() {
 
     if (savedQuestions) {
       const parsedQuestions = JSON.parse(savedQuestions);
+      setAllQuestions(parsedQuestions);
       const shuffledQuestions = [...parsedQuestions].sort(
         () => Math.random() - 0.5
       );
@@ -56,23 +58,6 @@ export default function PracticePage() {
 
     setIsLoading(false);
   }, []);
-
-  useEffect(() => {
-    if (questions.length > 0 && selectedCategories.length > 0) {
-      let filteredQuestions = questions;
-      if (selectedCategories.length < categories.length) {
-        filteredQuestions = questions.filter((q) =>
-          selectedCategories.includes(q.category)
-        );
-      }
-      const shuffledQuestions = [...filteredQuestions].sort(
-        () => Math.random() - 0.5
-      );
-      setQuestions(shuffledQuestions);
-      setCurrentIndex(0);
-      setCurrentQuestion(shuffledQuestions[0]?.question || "");
-    }
-  }, [selectedCategories]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -158,6 +143,22 @@ export default function PracticePage() {
     setTimeout(() => {
       window.location.href = "/";
     }, 3000);
+  };
+
+  const handleCategoryConfirm = () => {
+    let filteredQuestions = allQuestions;
+    if (selectedCategories.length < categories.length) {
+      filteredQuestions = allQuestions.filter((q) =>
+        selectedCategories.includes(q.category)
+      );
+    }
+    const shuffledQuestions = [...filteredQuestions].sort(
+      () => Math.random() - 0.5
+    );
+    setQuestions(shuffledQuestions);
+    setCurrentIndex(0);
+    setCurrentQuestion(shuffledQuestions[0]?.question || "");
+    setShowCategoryModal(false);
   };
 
   if (isLoading) {
@@ -402,15 +403,20 @@ export default function PracticePage() {
                           onChange={() => {}}
                           className="h-4 w-4 text-[#E8AA9B] border-[#DED0C3] rounded focus:ring-[#E8AA9B]"
                         />
-                        <span className="text-[#263339]">{category}</span>
+                        <span className="text-[#5C6B73]">{category}</span>
                       </div>
                     ))}
                   </div>
                   <Button
-                    onClick={() => setShowCategoryModal(false)}
-                    className="w-full bg-[#E8AA9B] hover:bg-[#E09686] text-white"
+                    onClick={handleCategoryConfirm}
+                    className={`w-full ${
+                      selectedCategories.length > 0
+                        ? "bg-[#D67D6A] hover:bg-[#C46A57] text-white font-medium shadow-sm"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    }`}
+                    disabled={selectedCategories.length === 0}
                   >
-                    확인
+                    면접 시작하기
                   </Button>
                 </div>
               </div>
