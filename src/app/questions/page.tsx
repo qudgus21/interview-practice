@@ -3,10 +3,25 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { InterviewQuestion, Priority } from "@/types/interview";
-import { Plus, Trash2, Tag, X } from "lucide-react";
+import { Plus, Tag, X } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { Modal } from "@/components/ui/modal";
 import { CustomSelect } from "@/components/ui/custom-select";
+import { SortableCard } from "@/components/ui/sortable-card";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  arrayMove,
+} from "@dnd-kit/sortable";
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
@@ -29,6 +44,13 @@ export default function QuestionsPage() {
   const [categories, setCategories] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState("");
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     const savedQuestions = localStorage.getItem("interviewQuestions");
@@ -140,6 +162,18 @@ export default function QuestionsPage() {
     saveQuestions(updatedQuestions);
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = questions.findIndex((q) => q.id === active.id);
+    const newIndex = questions.findIndex((q) => q.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const newQuestions = arrayMove(questions, oldIndex, newIndex);
+    saveQuestions(newQuestions);
+  };
+
   const filteredQuestions = questions.filter(
     (q) =>
       (filter === "all" || q.priority === filter) &&
@@ -202,54 +236,22 @@ export default function QuestionsPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {filteredQuestions.map((q) => (
-              <div
-                key={q.id}
-                className="p-4 border border-[#DED0C3] rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer h-[180px] flex flex-col hover:border-[#E8AA9B] relative group"
-                onClick={() => handleEditQuestion(q)}
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        q.priority === "high"
-                          ? "bg-[#FFE5E5] text-[#FF7676]"
-                          : q.priority === "medium"
-                          ? "bg-[#FFF3E5] text-[#FFA05A]"
-                          : "bg-[#E8F3E5] text-[#7AB55C]"
-                      }`}
-                    >
-                      {q.priority === "high"
-                        ? "높음"
-                        : q.priority === "medium"
-                        ? "보통"
-                        : "낮음"}
-                    </span>
-                    {q.category && (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-[#E8E8E8] text-[#5C6B73]">
-                        {q.category}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-base font-semibold text-[#2C3639] break-words whitespace-normal line-clamp-3 min-h-[4rem]">
-                    {q.question}
-                  </h3>
-                </div>
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-[#5C6B73] hover:text-[#FF7676] hover:bg-[#FFE5E5]"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteQuestion(q.id);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={filteredQuestions.map((q) => q.id)}>
+                {filteredQuestions.map((q) => (
+                  <SortableCard
+                    key={q.id}
+                    question={q}
+                    onClick={() => handleEditQuestion(q)}
+                    onDelete={() => deleteQuestion(q.id)}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
         </div>
       </div>
