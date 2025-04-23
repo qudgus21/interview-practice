@@ -28,7 +28,7 @@ export default function PracticePage() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
 
@@ -41,7 +41,6 @@ export default function PracticePage() {
 
     if (savedQuestions) {
       const parsedQuestions = JSON.parse(savedQuestions);
-      // 전체 문항을 랜덤하게 섞어서 설정
       const shuffledQuestions = [...parsedQuestions].sort(
         () => Math.random() - 0.5
       );
@@ -52,7 +51,7 @@ export default function PracticePage() {
     if (savedCategories) {
       const parsedCategories = JSON.parse(savedCategories);
       setCategories(parsedCategories);
-      setSelectedCategories(parsedCategories.map((cat: Category) => cat.name));
+      setSelectedCategories(parsedCategories);
     }
 
     setIsLoading(false);
@@ -146,7 +145,7 @@ export default function PracticePage() {
   };
 
   const selectAllCategories = () => {
-    setSelectedCategories(categories.map((cat) => cat.name));
+    setSelectedCategories(categories);
   };
 
   const deselectAllCategories = () => {
@@ -393,17 +392,17 @@ export default function PracticePage() {
                     </div>
                     {categories.map((category) => (
                       <div
-                        key={category.name}
+                        key={category}
                         className="flex items-center space-x-2 p-2 hover:bg-[#FDF8F3] rounded-lg cursor-pointer"
-                        onClick={() => toggleCategory(category.name)}
+                        onClick={() => toggleCategory(category)}
                       >
                         <input
                           type="checkbox"
-                          checked={selectedCategories.includes(category.name)}
+                          checked={selectedCategories.includes(category)}
                           onChange={() => {}}
                           className="h-4 w-4 text-[#E8AA9B] border-[#DED0C3] rounded focus:ring-[#E8AA9B]"
                         />
-                        <span className="text-[#5C6B73]">{category.name}</span>
+                        <span className="text-[#263339]">{category}</span>
                       </div>
                     ))}
                   </div>
