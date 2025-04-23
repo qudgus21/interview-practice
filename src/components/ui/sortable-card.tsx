@@ -74,7 +74,7 @@ export function SortableCard({
           {question.category && (
             <div className="flex items-center gap-2">
               <span
-                className="px-2 py-1 text-xs rounded-full"
+                className="px-2 py-1 text-xs rounded-full border border-[#DED0C3]"
                 style={{
                   backgroundColor: categories.find(
                     (c) => c.name === question.category
