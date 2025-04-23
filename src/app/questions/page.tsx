@@ -142,7 +142,7 @@ export default function QuestionsPage() {
 
   const addCategory = () => {
     if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-      const updatedCategories = [...categories, newCategory.trim()];
+      const updatedCategories = [newCategory.trim(), ...categories];
       saveCategories(updatedCategories);
       setNewCategory("");
     }
@@ -377,7 +377,7 @@ export default function QuestionsPage() {
               추가
             </Button>
           </div>
-          <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+          <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
             {categories.map((category) => (
               <div
                 key={category}
