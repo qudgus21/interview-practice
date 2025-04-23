@@ -224,22 +224,49 @@ export default function QuestionsPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext items={filteredQuestions.map((q) => q.id)}>
-                {filteredQuestions.map((q) => (
-                  <SortableCard
-                    key={q.id}
-                    question={q}
-                    onClick={() => handleEditQuestion(q)}
-                    onDelete={() => deleteQuestion(q.id)}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
+            {filteredQuestions.length === 0 ? (
+              <div className="col-span-full">
+                <div className="bg-white p-6 rounded-lg border border-[#DED0C3] shadow-sm">
+                  <div className="flex flex-col items-center justify-center text-center space-y-4">
+                    <div className="w-16 h-16 bg-[#FDF8F3] rounded-full flex items-center justify-center">
+                      <Plus className="w-8 h-8 text-[#E8AA9B]" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-medium text-[#2C3639] mb-2">
+                        아직 질문이 없습니다
+                      </h3>
+                      <p className="text-[#5C6B73]">
+                        새로운 면접 질문을 추가해보세요
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => setIsModalOpen(true)}
+                      className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      질문 추가하기
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext items={filteredQuestions.map((q) => q.id)}>
+                  {filteredQuestions.map((q) => (
+                    <SortableCard
+                      key={q.id}
+                      question={q}
+                      onClick={() => handleEditQuestion(q)}
+                      onDelete={() => deleteQuestion(q.id)}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
+            )}
           </div>
         </div>
       </div>
