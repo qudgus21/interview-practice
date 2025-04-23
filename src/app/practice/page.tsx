@@ -30,7 +30,10 @@ export default function PracticePage() {
     const savedQuestions = localStorage.getItem("interviewQuestions");
     if (savedQuestions) {
       const parsedQuestions = JSON.parse(savedQuestions);
-      setQuestions(parsedQuestions);
+      const shuffledQuestions = [...parsedQuestions].sort(
+        () => Math.random() - 0.5
+      );
+      setQuestions(shuffledQuestions);
     }
   }, []);
 
