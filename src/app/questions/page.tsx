@@ -44,7 +44,11 @@ export default function QuestionsPage() {
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px 이상 드래그해야 드래그로 인식
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
