@@ -273,7 +273,7 @@ export default function PracticePage() {
     <div className="min-h-screen bg-[#FDF8F3]">
       <Navigation />
       <div className="container mx-auto p-4 max-w-4xl">
-        <div className="mt-16">
+        <div className="mt-25">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
             <div className="text-center md:text-left w-full md:w-auto">
               <h1 className="text-2xl md:text-3xl font-bold text-[#2C3639] mb-2">

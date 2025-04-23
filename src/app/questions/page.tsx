@@ -210,46 +210,46 @@ export default function QuestionsPage() {
   return (
     <div className="min-h-screen bg-[#FDF8F3]">
       <Navigation />
-      <div className="container mx-auto p-4 max-w-5xl">
-        <div className="mt-16 md:mt-20">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0 mb-8">
+      <div className="container mx-auto p-4 max-w-6xl">
+        <div className="mt-25">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-[#2C3639] mb-2">
+              <h1 className="text-3xl font-bold text-[#2C3639] mb-2">
                 면접 질문 관리
               </h1>
               <p className="text-[#5C6B73]">
-                면접 준비를 위한 질문을 관리하세요
+                면접 질문과 모범 답안을 관리하세요
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-[#E8AA9B] hover:bg-[#E09686] text-white shadow-md transition-colors w-full sm:w-auto"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                질문 추가
-              </Button>
-              <Button
-                onClick={() => setIsCategoryModalOpen(true)}
-                className="bg-white text-[#2C3639] border border-[#DED0C3] hover:bg-[#FDF8F3] w-full sm:w-auto"
-              >
-                <Tag className="mr-2 h-4 w-4" />
-                카테고리 관리
-              </Button>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <CustomSelect
-                  value={categoryFilter}
-                  onChange={setCategoryFilter}
-                  options={[
-                    { value: "all", label: "전체 카테고리" },
-                    ...categories.map((category) => ({
-                      value: category.name,
-                      label: category.name,
-                    })),
-                  ]}
-                  className="w-[200px]"
-                />
+            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+              <div className="flex gap-2 w-full md:w-auto">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCategoryModalOpen(true)}
+                  className="flex items-center space-x-2 flex-1 md:flex-initial"
+                >
+                  <Tag className="h-4 w-4" />
+                  <span>카테고리 관리</span>
+                </Button>
+                <Button
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-[#E8AA9B] hover:bg-[#E09686] text-white flex-1 md:flex-initial"
+                >
+                  <Plus className="mr-2 h-4 w-4" />새 질문 추가
+                </Button>
               </div>
+              <CustomSelect
+                value={categoryFilter}
+                onChange={setCategoryFilter}
+                options={[
+                  { value: "all", label: "전체 카테고리" },
+                  ...categories.map((category) => ({
+                    value: category.name,
+                    label: category.name,
+                  })),
+                ]}
+                className="w-full md:w-[200px]"
+              />
             </div>
           </div>
 

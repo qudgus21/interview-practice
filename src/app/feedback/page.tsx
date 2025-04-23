@@ -89,8 +89,8 @@ export default function FeedbackPage() {
   return (
     <div className="min-h-screen bg-[#FDF8F3]">
       <Navigation />
-      <div className="container mx-auto p-4 max-w-6xl">
-        <div className="mt-16">
+      <div className="container mx-auto p-4 max-w-4xl">
+        <div className="mt-25">
           <div className="text-center md:text-left mb-12">
             <h1 className="text-3xl font-bold text-[#2C3639] mb-2">
               면접 연습 분석
