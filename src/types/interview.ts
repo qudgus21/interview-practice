@@ -5,6 +5,7 @@ export interface InterviewQuestion {
   question: string;
   answer: string;
   priority: Priority;
+  category: string;
   createdAt: Date;
 }
 

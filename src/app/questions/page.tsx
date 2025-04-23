@@ -3,13 +3,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { InterviewQuestion, Priority } from "@/types/interview";
-import { Plus, Trash2, Edit2 } from "lucide-react";
+import { Plus, Trash2, Tag, X } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { Modal } from "@/components/ui/modal";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
   const [filter, setFilter] = useState<Priority | "all">("all");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] =
     useState<InterviewQuestion | null>(null);
@@ -17,16 +19,25 @@ export default function QuestionsPage() {
     question: "",
     answer: "",
     priority: "medium" as Priority,
+    category: "",
   });
   const [errors, setErrors] = useState({
     question: "",
     answer: "",
+    category: "",
   });
+  const [categories, setCategories] = useState<string[]>([]);
+  const [newCategory, setNewCategory] = useState("");
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
   useEffect(() => {
     const savedQuestions = localStorage.getItem("interviewQuestions");
+    const savedCategories = localStorage.getItem("interviewCategories");
     if (savedQuestions) {
       setQuestions(JSON.parse(savedQuestions));
+    }
+    if (savedCategories) {
+      setCategories(JSON.parse(savedCategories));
     }
   }, []);
 
@@ -35,12 +46,18 @@ export default function QuestionsPage() {
     localStorage.setItem("interviewQuestions", JSON.stringify(newQuestions));
   };
 
+  const saveCategories = (newCategories: string[]) => {
+    setCategories(newCategories);
+    localStorage.setItem("interviewCategories", JSON.stringify(newCategories));
+  };
+
   const handleEditQuestion = (question: InterviewQuestion) => {
     setEditingQuestion(question);
     setFormData({
       question: question.question,
       answer: question.answer,
       priority: question.priority,
+      category: question.category,
     });
     setIsModalOpen(true);
   };
@@ -49,6 +66,7 @@ export default function QuestionsPage() {
     const newErrors = {
       question: "",
       answer: "",
+      category: "",
     };
 
     if (!formData.question.trim()) {
@@ -73,6 +91,7 @@ export default function QuestionsPage() {
               question: formData.question,
               answer: formData.answer,
               priority: formData.priority,
+              category: formData.category,
             }
           : q
       );
@@ -86,31 +105,51 @@ export default function QuestionsPage() {
       saveQuestions([...questions, question]);
     }
 
-    setFormData({ question: "", answer: "", priority: "medium" });
+    setFormData({ question: "", answer: "", priority: "medium", category: "" });
     setEditingQuestion(null);
-    setErrors({ question: "", answer: "" });
+    setErrors({ question: "", answer: "", category: "" });
     setIsModalOpen(false);
   };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
     setEditingQuestion(null);
-    setFormData({ question: "", answer: "", priority: "medium" });
-    setErrors({ question: "", answer: "" });
+    setFormData({ question: "", answer: "", priority: "medium", category: "" });
+    setErrors({ question: "", answer: "", category: "" });
   };
 
   const deleteQuestion = (id: string) => {
     saveQuestions(questions.filter((q) => q.id !== id));
   };
 
+  const addCategory = () => {
+    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
+      const updatedCategories = [...categories, newCategory.trim()];
+      saveCategories(updatedCategories);
+      setNewCategory("");
+    }
+  };
+
+  const deleteCategory = (category: string) => {
+    const updatedCategories = categories.filter((c) => c !== category);
+    saveCategories(updatedCategories);
+    // 해당 카테고리의 질문들의 카테고리를 빈 문자열로 설정
+    const updatedQuestions = questions.map((q) =>
+      q.category === category ? { ...q, category: "" } : q
+    );
+    saveQuestions(updatedQuestions);
+  };
+
   const filteredQuestions = questions.filter(
-    (q) => filter === "all" || q.priority === filter
+    (q) =>
+      (filter === "all" || q.priority === filter) &&
+      (categoryFilter === "all" || q.category === categoryFilter)
   );
 
   return (
     <div className="min-h-screen bg-[#FDF8F3]">
+      <Navigation />
       <div className="container mx-auto p-4 max-w-5xl">
-        <Navigation />
         <div className="mt-16">
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -129,16 +168,36 @@ export default function QuestionsPage() {
                 <Plus className="mr-2 h-4 w-4" />
                 질문 추가
               </Button>
-              <select
-                className="border border-[#DED0C3] rounded-lg px-4 py-2 bg-white text-[#2C3639] focus:outline-none focus:ring-2 focus:ring-[#E8AA9B] focus:border-[#E8AA9B] shadow-sm"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value as Priority | "all")}
+              <Button
+                onClick={() => setIsCategoryModalOpen(true)}
+                className="bg-white text-[#2C3639] border border-[#DED0C3] hover:bg-[#FDF8F3]"
               >
-                <option value="all">전체</option>
-                <option value="high">높음</option>
-                <option value="medium">보통</option>
-                <option value="low">낮음</option>
-              </select>
+                <Tag className="mr-2 h-4 w-4" />
+                카테고리 관리
+              </Button>
+              <div className="flex items-center gap-2">
+                <CustomSelect
+                  value={filter}
+                  onChange={(value) => setFilter(value as Priority | "all")}
+                  options={[
+                    { value: "all", label: "전체 난이도" },
+                    { value: "high", label: "높음" },
+                    { value: "medium", label: "보통" },
+                    { value: "low", label: "낮음" },
+                  ]}
+                />
+                <CustomSelect
+                  value={categoryFilter}
+                  onChange={setCategoryFilter}
+                  options={[
+                    { value: "all", label: "전체 카테고리" },
+                    ...categories.map((category) => ({
+                      value: category,
+                      label: category,
+                    })),
+                  ]}
+                />
+              </div>
             </div>
           </div>
 
@@ -204,6 +263,38 @@ export default function QuestionsPage() {
 
               <div>
                 <label
+                  htmlFor="category"
+                  className="block text-sm font-medium text-[#2C3639] mb-2"
+                >
+                  카테고리
+                </label>
+                <select
+                  id="category"
+                  className={`w-full p-3 border rounded-lg bg-white text-[#2C3639] focus:outline-none focus:ring-2 focus:ring-[#E8AA9B] focus:border-[#E8AA9B] transition-colors ${
+                    errors.category ? "border-red-500" : "border-[#DED0C3]"
+                  }`}
+                  value={formData.category}
+                  onChange={(e) => {
+                    setFormData({ ...formData, category: e.target.value });
+                    if (errors.category) {
+                      setErrors({ ...errors, category: "" });
+                    }
+                  }}
+                >
+                  <option value="">카테고리 선택</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+                {errors.category && (
+                  <p className="mt-1 text-sm text-red-500">{errors.category}</p>
+                )}
+              </div>
+
+              <div>
+                <label
                   htmlFor="priority"
                   className="block text-sm font-medium text-[#2C3639] mb-2"
                 >
@@ -244,6 +335,54 @@ export default function QuestionsPage() {
             </div>
           </Modal>
 
+          <Modal
+            isOpen={isCategoryModalOpen}
+            onClose={() => setIsCategoryModalOpen(false)}
+            title="카테고리 관리"
+            className="max-w-md bg-[#FDF8F3]"
+          >
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="새 카테고리 입력"
+                  className="flex-1 p-2 border border-[#DED0C3] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E8AA9B] focus:border-[#E8AA9B]"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      addCategory();
+                    }
+                  }}
+                />
+                <Button
+                  onClick={addCategory}
+                  className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
+                >
+                  추가
+                </Button>
+              </div>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                {categories.map((category) => (
+                  <div
+                    key={category}
+                    className="flex items-center justify-between p-2 bg-white rounded-lg border border-[#DED0C3]"
+                  >
+                    <span className="text-[#2C3639]">{category}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteCategory(category)}
+                      className="text-[#5C6B73] hover:text-red-500"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Modal>
+
           <div className="grid grid-cols-4 gap-4">
             {filteredQuestions.map((q) => (
               <div
@@ -268,8 +407,13 @@ export default function QuestionsPage() {
                         ? "보통"
                         : "낮음"}
                     </span>
+                    {q.category && (
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-[#E8E8E8] text-[#5C6B73]">
+                        {q.category}
+                      </span>
+                    )}
                   </div>
-                  <h3 className="text-base font-semibold text-[#2C3639] break-words whitespace-normal line-clamp-2 min-h-[3rem]">
+                  <h3 className="text-base font-semibold text-[#2C3639] break-words whitespace-normal line-clamp-3 min-h-[4rem]">
                     {q.question}
                   </h3>
                 </div>
