@@ -165,6 +165,7 @@ export default function QuestionsPage() {
       newCategory.trim() &&
       !categories.some((c) => c.name === newCategory.trim())
     ) {
+      console.log(generateRandomColor(categories.map((c) => c.color)));
       const newCategories = [
         {
           name: newCategory.trim(),
@@ -290,6 +291,7 @@ export default function QuestionsPage() {
                     <SortableCard
                       key={q.id}
                       question={q}
+                      categories={categories}
                       onClick={() => handleEditQuestion(q)}
                       onDelete={() => deleteQuestion(q.id)}
                     />

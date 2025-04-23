@@ -3,12 +3,13 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
-import { InterviewQuestion } from "@/types/interview";
+import { InterviewQuestion, Category } from "@/types/interview";
 import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
 
 interface SortableCardProps {
   question: InterviewQuestion;
+  categories: Category[];
   onClick: () => void;
   onDelete: () => void;
 }
@@ -35,6 +36,7 @@ const getCategoryColor = (category: string) => {
 
 export function SortableCard({
   question,
+  categories,
   onClick,
   onDelete,
 }: SortableCardProps) {
@@ -70,11 +72,18 @@ export function SortableCard({
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-3 min-h-[24px]">
           {question.category && (
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${categoryColor}`}
-            >
-              {question.category}
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className="px-2 py-1 text-xs rounded-full"
+                style={{
+                  backgroundColor: categories.find(
+                    (c) => c.name === question.category
+                  )?.color,
+                }}
+              >
+                {question.category}
+              </span>
+            </div>
           )}
         </div>
         <h3 className="text-base font-semibold text-[#2C3639] break-words whitespace-normal line-clamp-3 min-h-[4rem]">
