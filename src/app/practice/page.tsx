@@ -132,7 +132,11 @@ export default function PracticePage() {
           </div>
 
           <div className="flex gap-6">
-            <div className="flex-1">
+            <div
+              className={`transition-all duration-300 ${
+                showAnswer ? "w-2/3" : "w-full"
+              }`}
+            >
               <div className="bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 mb-6">
                 <h2 className="text-xl font-semibold text-[#2C3639] mb-4">
                   현재 질문
@@ -219,8 +223,14 @@ export default function PracticePage() {
               </div>
             </div>
 
-            {showAnswer && (
-              <div className="w-80 bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 h-fit">
+            <div
+              className={`transition-all duration-300 ${
+                showAnswer
+                  ? "w-1/3 opacity-100 translate-x-0"
+                  : "w-0 opacity-0 translate-x-full"
+              } overflow-hidden`}
+            >
+              <div className="bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 h-fit">
                 <h2 className="text-xl font-semibold text-[#2C3639] mb-4">
                   모범답안
                 </h2>
@@ -230,7 +240,7 @@ export default function PracticePage() {
                   </p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
