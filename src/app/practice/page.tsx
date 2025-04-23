@@ -14,6 +14,10 @@ interface InterviewQuestion {
   category: string;
 }
 
+interface Category {
+  name: string;
+}
+
 export default function PracticePage() {
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -23,20 +27,52 @@ export default function PracticePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
 
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
 
   useEffect(() => {
     const savedQuestions = localStorage.getItem("interviewQuestions");
+    const savedCategories = localStorage.getItem("interviewCategories");
+
     if (savedQuestions) {
       const parsedQuestions = JSON.parse(savedQuestions);
+      // 전체 문항을 랜덤하게 섞어서 설정
       const shuffledQuestions = [...parsedQuestions].sort(
         () => Math.random() - 0.5
       );
       setQuestions(shuffledQuestions);
+      setCurrentQuestion(shuffledQuestions[0]?.question || "");
     }
+
+    if (savedCategories) {
+      const parsedCategories = JSON.parse(savedCategories);
+      setCategories(parsedCategories);
+      setSelectedCategories(parsedCategories.map((cat: Category) => cat.name));
+    }
+
+    setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (questions.length > 0 && selectedCategories.length > 0) {
+      let filteredQuestions = questions;
+      if (selectedCategories.length < categories.length) {
+        filteredQuestions = questions.filter((q) =>
+          selectedCategories.includes(q.category)
+        );
+      }
+      const shuffledQuestions = [...filteredQuestions].sort(
+        () => Math.random() - 0.5
+      );
+      setQuestions(shuffledQuestions);
+      setCurrentIndex(0);
+      setCurrentQuestion(shuffledQuestions[0]?.question || "");
+    }
+  }, [selectedCategories]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -47,12 +83,6 @@ export default function PracticePage() {
     }
     return () => clearInterval(interval);
   }, [isRecording, isPaused]);
-
-  useEffect(() => {
-    if (questions.length > 0) {
-      setCurrentQuestion(questions[currentIndex].question);
-    }
-  }, [questions, currentIndex]);
 
   useEffect(() => {
     // 음성 인식 지원 여부 확인 후 로딩 상태 변경
@@ -90,6 +120,7 @@ export default function PracticePage() {
   const nextQuestion = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      setCurrentQuestion(questions[currentIndex + 1].question);
       resetPractice();
       setShowAnswer(false);
     }
@@ -101,6 +132,24 @@ export default function PracticePage() {
     return `${mins.toString().padStart(2, "0")}:${secs
       .toString()
       .padStart(2, "0")}`;
+  };
+
+  const toggleCategory = (categoryName: string) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(categoryName)) {
+        return prev.filter((cat) => cat !== categoryName);
+      } else {
+        return [...prev, categoryName];
+      }
+    });
+  };
+
+  const selectAllCategories = () => {
+    setSelectedCategories(categories.map((cat) => cat.name));
+  };
+
+  const deselectAllCategories = () => {
+    setSelectedCategories([]);
   };
 
   if (isLoading) {
@@ -150,8 +199,20 @@ export default function PracticePage() {
                 음성 인식을 활용한 실전 면접 연습을 시작하세요
               </p>
             </div>
-            <div className="text-3xl font-bold text-[#2C3639]">
-              {formatTime(timer)}
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowCategoryModal(true)}
+                className="flex items-center space-x-2"
+              >
+                <span>카테고리 설정</span>
+                <span className="text-sm text-[#5C6B73]">
+                  ({selectedCategories.length}개 선택)
+                </span>
+              </Button>
+              <div className="text-3xl font-bold text-[#2C3639]">
+                {formatTime(timer)}
+              </div>
             </div>
           </div>
 
@@ -242,6 +303,65 @@ export default function PracticePage() {
                 </div>
               </div>
             </div>
+
+            {/* Category Selection Modal */}
+            {showCategoryModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-6 w-full max-w-md">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-semibold text-[#2C3639]">
+                      카테고리 선택
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowCategoryModal(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={selectAllCategories}
+                      >
+                        전체 선택
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={deselectAllCategories}
+                      >
+                        전체 해제
+                      </Button>
+                    </div>
+                    {categories.map((category) => (
+                      <div
+                        key={category.name}
+                        className="flex items-center space-x-2 p-2 hover:bg-[#FDF8F3] rounded-lg cursor-pointer"
+                        onClick={() => toggleCategory(category.name)}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(category.name)}
+                          onChange={() => {}}
+                          className="h-4 w-4 text-[#E8AA9B] border-[#DED0C3] rounded focus:ring-[#E8AA9B]"
+                        />
+                        <span className="text-[#5C6B73]">{category.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    onClick={() => setShowCategoryModal(false)}
+                    className="w-full bg-[#E8AA9B] hover:bg-[#E09686] text-white"
+                  >
+                    확인
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Sidebar */}
             <div
