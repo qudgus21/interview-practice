@@ -61,7 +61,7 @@ export default function Home() {
               </li>
               <li className="flex items-center w-44 md:w-48">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#FF7676] mr-2.5"></div>
-                난이도 설정 (상/중/하)
+                드래그앤드롭 순서 조정
               </li>
             </ul>
           </div>
