@@ -5,12 +5,33 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { InterviewQuestion } from "@/types/interview";
 import { Trash2 } from "lucide-react";
+import { useMemo } from "react";
 
 interface SortableCardProps {
   question: InterviewQuestion;
   onClick: () => void;
   onDelete: () => void;
 }
+
+const categoryColors = [
+  "bg-blue-100 text-blue-700",
+  "bg-green-100 text-green-700",
+  "bg-purple-100 text-purple-700",
+  "bg-orange-100 text-orange-700",
+  "bg-pink-100 text-pink-700",
+  "bg-teal-100 text-teal-700",
+  "bg-indigo-100 text-indigo-700",
+  "bg-amber-100 text-amber-700",
+];
+
+const getCategoryColor = (category: string) => {
+  if (!category) return "";
+  // 카테고리 문자열을 해시값으로 변환하여 일관된 색상 부여
+  const hash = category.split("").reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  return categoryColors[Math.abs(hash) % categoryColors.length];
+};
 
 export function SortableCard({
   question,
@@ -32,6 +53,11 @@ export function SortableCard({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const categoryColor = useMemo(
+    () => getCategoryColor(question.category),
+    [question.category]
+  );
+
   return (
     <div
       ref={setNodeRef}
@@ -42,24 +68,11 @@ export function SortableCard({
       onClick={onClick}
     >
       <div className="flex-1">
-        <div className="flex items-center gap-2 mb-2">
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${
-              question.priority === "high"
-                ? "bg-[#FFE5E5] text-[#FF7676]"
-                : question.priority === "medium"
-                ? "bg-[#FFF3E5] text-[#FFA05A]"
-                : "bg-[#E8F3E5] text-[#7AB55C]"
-            }`}
-          >
-            {question.priority === "high"
-              ? "높음"
-              : question.priority === "medium"
-              ? "보통"
-              : "낮음"}
-          </span>
+        <div className="flex items-center gap-2 mb-3 min-h-[24px]">
           {question.category && (
-            <span className="px-2 py-1 rounded-full text-xs font-medium bg-[#E8E8E8] text-[#5C6B73]">
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium ${categoryColor}`}
+            >
               {question.category}
             </span>
           )}

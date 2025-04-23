@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { InterviewQuestion, Priority } from "@/types/interview";
+import { InterviewQuestion } from "@/types/interview";
 import { Plus, Tag, X } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { Modal } from "@/components/ui/modal";
@@ -25,7 +25,6 @@ import {
 
 export default function QuestionsPage() {
   const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
-  const [filter, setFilter] = useState<Priority | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] =
@@ -33,7 +32,6 @@ export default function QuestionsPage() {
   const [formData, setFormData] = useState({
     question: "",
     answer: "",
-    priority: "medium" as Priority,
     category: "",
   });
   const [errors, setErrors] = useState({
@@ -78,7 +76,6 @@ export default function QuestionsPage() {
     setFormData({
       question: question.question,
       answer: question.answer,
-      priority: question.priority,
       category: question.category,
     });
     setIsModalOpen(true);
@@ -112,7 +109,6 @@ export default function QuestionsPage() {
               ...q,
               question: formData.question,
               answer: formData.answer,
-              priority: formData.priority,
               category: formData.category,
             }
           : q
@@ -127,7 +123,7 @@ export default function QuestionsPage() {
       saveQuestions([...questions, question]);
     }
 
-    setFormData({ question: "", answer: "", priority: "medium", category: "" });
+    setFormData({ question: "", answer: "", category: "" });
     setEditingQuestion(null);
     setErrors({ question: "", answer: "", category: "" });
     setIsModalOpen(false);
@@ -136,7 +132,7 @@ export default function QuestionsPage() {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setEditingQuestion(null);
-    setFormData({ question: "", answer: "", priority: "medium", category: "" });
+    setFormData({ question: "", answer: "", category: "" });
     setErrors({ question: "", answer: "", category: "" });
   };
 
@@ -175,9 +171,7 @@ export default function QuestionsPage() {
   };
 
   const filteredQuestions = questions.filter(
-    (q) =>
-      (filter === "all" || q.priority === filter) &&
-      (categoryFilter === "all" || q.category === categoryFilter)
+    (q) => categoryFilter === "all" || q.category === categoryFilter
   );
 
   return (
@@ -210,16 +204,6 @@ export default function QuestionsPage() {
                 카테고리 관리
               </Button>
               <div className="flex flex-col sm:flex-row gap-2">
-                <CustomSelect
-                  value={filter}
-                  onChange={(value) => setFilter(value as Priority | "all")}
-                  options={[
-                    { value: "all", label: "전체 난이도" },
-                    { value: "high", label: "높음" },
-                    { value: "medium", label: "보통" },
-                    { value: "low", label: "낮음" },
-                  ]}
-                />
                 <CustomSelect
                   value={categoryFilter}
                   onChange={setCategoryFilter}
@@ -346,30 +330,6 @@ export default function QuestionsPage() {
             {errors.category && (
               <p className="mt-1 text-sm text-red-500">{errors.category}</p>
             )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="priority"
-              className="block text-sm font-medium text-[#2C3639] mb-2"
-            >
-              중요도
-            </label>
-            <select
-              id="priority"
-              className="w-full p-3 border border-[#DED0C3] rounded-lg bg-white text-[#2C3639] focus:outline-none focus:ring-2 focus:ring-[#E8AA9B] focus:border-[#E8AA9B] transition-colors"
-              value={formData.priority}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  priority: e.target.value as Priority,
-                })
-              }
-            >
-              <option value="high">높음</option>
-              <option value="medium">보통</option>
-              <option value="low">낮음</option>
-            </select>
           </div>
 
           <div className="flex justify-end gap-3 pt-6">
