@@ -82,11 +82,11 @@ export default function Home() {
               </li>
               <li className="flex items-center w-44 md:w-48">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#5C6B73] mr-2.5"></div>
-                실시간 음성 분석
+                카테고리별 맞춤 면접 연습
               </li>
               <li className="flex items-center w-44 md:w-48">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#5C6B73] mr-2.5"></div>
-                답변 시간 측정
+                답변 시간 측정 및 관리
               </li>
             </ul>
           </div>
