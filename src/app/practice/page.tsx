@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/navigation";
-import { Mic, MicOff, RotateCcw, Pause, Play, BookOpen } from "lucide-react";
+import { Mic, MicOff, RotateCcw, Pause, Play, BookOpen, X } from "lucide-react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -134,12 +134,8 @@ export default function PracticePage() {
             </div>
           </div>
 
-          <div className="flex gap-6">
-            <div
-              className={`transition-all duration-300 ${
-                showAnswer ? "w-2/3" : "w-full"
-              }`}
-            >
+          <div className="relative">
+            <div className="w-full">
               <div className="bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 mb-6">
                 <h2 className="text-xl font-semibold text-[#2C3639] mb-4">
                   현재 질문
@@ -226,21 +222,32 @@ export default function PracticePage() {
               </div>
             </div>
 
+            {/* Sidebar */}
             <div
-              className={`transition-all duration-300 ${
-                showAnswer
-                  ? "w-1/3 opacity-100 translate-x-0"
-                  : "w-0 opacity-0 translate-x-full"
-              } overflow-hidden`}
+              className={`fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-lg border-l border-[#DED0C3] transition-transform duration-300 ease-in-out transform z-50 ${
+                showAnswer ? "translate-x-0" : "translate-x-full"
+              }`}
             >
-              <div className="bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 h-fit">
-                <h2 className="text-xl font-semibold text-[#2C3639] mb-4">
-                  모범답안
-                </h2>
-                <div className="bg-[#FDF8F3] p-4 rounded-lg">
-                  <p className="text-[#5C6B73] whitespace-pre-wrap">
-                    {questions[currentIndex]?.answer || "모범답안이 없습니다."}
-                  </p>
+              <div className="h-full flex flex-col">
+                <div className="flex justify-between items-center p-6 border-b border-[#DED0C3]">
+                  <h2 className="text-xl font-semibold text-[#2C3639]">
+                    모범답안
+                  </h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAnswer(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex-1 p-6 overflow-y-auto">
+                  <div className="bg-[#FDF8F3] p-4 rounded-lg">
+                    <p className="text-[#5C6B73] whitespace-pre-wrap">
+                      {questions[currentIndex]?.answer ||
+                        "모범답안이 없습니다."}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
