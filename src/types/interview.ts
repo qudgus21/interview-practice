@@ -62,3 +62,17 @@ export function generateRandomColor(usedColors: string[]): string {
   const randomIndex = Math.floor(Math.random() * CATEGORY_COLORS.length);
   return CATEGORY_COLORS[randomIndex];
 }
+
+export interface PracticeRecord {
+  questionId: string;
+  category: string;
+  question: string;
+  timestamp: number; // 연습 시작 시간
+  duration: number; // 응답 시간 (초)
+  attempt: number; // 해당 문항의 몇 번째 시도인지
+}
+
+export interface PracticeHistory {
+  records: PracticeRecord[];
+  lastUpdated: number;
+}

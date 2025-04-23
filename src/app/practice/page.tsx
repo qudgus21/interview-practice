@@ -1,21 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/navigation";
 import { Mic, MicOff, RotateCcw, Pause, Play, BookOpen, X } from "lucide-react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import { PracticeHistory, PracticeRecord } from "@/types/interview";
 
 interface InterviewQuestion {
   question: string;
   answer: string;
   category: string;
-}
-
-interface Category {
-  name: string;
 }
 
 export default function PracticePage() {
@@ -34,6 +31,17 @@ export default function PracticePage() {
   const [allQuestions, setAllQuestions] = useState<InterviewQuestion[]>([]);
   const [showRestartModal, setShowRestartModal] = useState(false);
   const [isRandomOrder, setIsRandomOrder] = useState(true);
+  const [practiceHistory, setPracticeHistory] = useState<PracticeHistory>(
+    () => {
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("practiceHistory");
+        return saved
+          ? JSON.parse(saved)
+          : { records: [], lastUpdated: Date.now() };
+      }
+      return { records: [], lastUpdated: Date.now() };
+    }
+  );
 
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
@@ -79,19 +87,23 @@ export default function PracticePage() {
   const startRecording = () => {
     setIsRecording(true);
     setIsPaused(false);
+    // @ts-ignore
     SpeechRecognition.startListening({ continuous: true });
   };
 
   const stopRecording = () => {
     setIsRecording(false);
     setIsPaused(false);
+    // @ts-ignore
     SpeechRecognition.stopListening();
   };
 
   const togglePause = () => {
     if (isPaused) {
+      // @ts-ignore
       SpeechRecognition.startListening({ continuous: true });
     } else {
+      // @ts-ignore
       SpeechRecognition.stopListening();
     }
     setIsPaused(!isPaused);
@@ -140,10 +152,11 @@ export default function PracticePage() {
   };
 
   const handleComplete = () => {
+    savePracticeRecord();
     setShowCompletion(true);
-    // 3초 후에 홈으로 이동
+    // 3초 후에 피드백 페이지로 이동
     setTimeout(() => {
-      window.location.href = "/";
+      window.location.href = "/feedback";
     }, 3000);
   };
 
@@ -179,6 +192,48 @@ export default function PracticePage() {
     setShowAnswer(false);
     resetPractice();
     setShowRestartModal(false);
+  };
+
+  // 연습 기록 저장 함수
+  const savePracticeRecord = useCallback(() => {
+    if (!currentQuestion) return;
+
+    // 현재 문항의 시도 횟수 계산
+    const questionAttempts = practiceHistory.records.filter(
+      (record) => record.questionId === currentQuestion
+    ).length;
+
+    const newRecord: PracticeRecord = {
+      questionId: currentQuestion,
+      category: questions[currentIndex]?.category || "",
+      question: questions[currentIndex]?.question || "",
+      timestamp: Date.now(),
+      duration: timer, // 현재 타이머 값
+      attempt: questionAttempts + 1,
+    };
+
+    const newHistory: PracticeHistory = {
+      records: [...practiceHistory.records, newRecord],
+      lastUpdated: Date.now(),
+    };
+
+    setPracticeHistory(newHistory);
+    localStorage.setItem("practiceHistory", JSON.stringify(newHistory));
+  }, [currentQuestion, currentIndex, questions, timer, practiceHistory]);
+
+  // 다음 질문으로 넘어갈 때 기록 저장
+  const handleNextQuestion = () => {
+    savePracticeRecord();
+    setCurrentIndex((prev) => {
+      const nextIndex = prev + 1;
+      if (nextIndex < questions.length) {
+        setCurrentQuestion(questions[nextIndex].question);
+        return nextIndex;
+      }
+      setShowCompletion(true);
+      return prev;
+    });
+    resetPractice();
   };
 
   if (isLoading) {
@@ -268,7 +323,7 @@ export default function PracticePage() {
                   </div>
                   {currentIndex < questions.length - 1 ? (
                     <Button
-                      onClick={nextQuestion}
+                      onClick={handleNextQuestion}
                       className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
                     >
                       다음 질문
@@ -375,7 +430,7 @@ export default function PracticePage() {
                       면접 완료!
                     </h2>
                     <p className="text-[#5C6B73]">
-                      수고하셨습니다. 홈으로 이동합니다...
+                      수고하셨습니다. 분석 페이지로 이동합니다...
                     </p>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5">

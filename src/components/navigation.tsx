@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Mic } from "lucide-react";
+import { BookOpen, Mic, BarChart2 } from "lucide-react";
 
 export function Navigation() {
   const pathname = usePathname();
@@ -41,6 +41,17 @@ export function Navigation() {
             >
               <Mic className="h-4 w-4" />
               <span>실전 연습</span>
+            </Link>
+            <Link
+              href="/feedback"
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                pathname === "/feedback"
+                  ? "bg-[#E8AA9B] text-white"
+                  : "text-[#5C6B73] hover:bg-[#FDF8F3]"
+              }`}
+            >
+              <BarChart2 className="h-4 w-4" />
+              <span>연습 분석</span>
             </Link>
           </div>
         </div>
