@@ -219,35 +219,37 @@ export default function PracticePage() {
       <Navigation />
       <div className="container mx-auto p-4 max-w-4xl">
         <div className="mt-16">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-[#2C3639] mb-2">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+            <div className="text-center md:text-left w-full md:w-auto">
+              <h1 className="text-2xl md:text-3xl font-bold text-[#2C3639] mb-2">
                 실전 면접 연습
               </h1>
-              <p className="text-[#5C6B73]">
+              <p className="text-sm md:text-base text-[#5C6B73]">
                 음성 인식을 활용한 실전 면접 연습을 시작하세요
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowCategoryModal(true)}
-                className="flex items-center space-x-2"
-              >
-                <span>카테고리 설정</span>
-                <span className="text-sm text-[#5C6B73]">
-                  ({selectedCategories.length}개 선택)
-                </span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowRestartModal(true)}
-                className="flex items-center space-x-2"
-              >
-                <RotateCcw className="h-4 w-4" />
-                <span>면접 재시작</span>
-              </Button>
-              <div className="text-3xl font-bold text-[#2C3639]">
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+              <div className="flex gap-2 w-full md:w-auto">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCategoryModal(true)}
+                  className="flex-1 md:flex-initial flex items-center justify-center space-x-2"
+                >
+                  <span>카테고리 설정</span>
+                  <span className="text-sm text-[#5C6B73]">
+                    ({selectedCategories.length}개 선택)
+                  </span>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowRestartModal(true)}
+                  className="flex-1 md:flex-initial flex items-center justify-center space-x-2"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  <span>면접 재시작</span>
+                </Button>
+              </div>
+              <div className="text-2xl md:text-3xl font-bold text-[#2C3639] w-full md:w-auto text-center">
                 {formatTime(timer)}
               </div>
             </div>
