@@ -306,9 +306,9 @@ export default function QuestionsPage() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         title={editingQuestion ? "질문 수정" : "새 질문 추가"}
-        className="max-w-4xl bg-[#FDF8F3]"
+        className="max-w-4xl bg-[#FDF8F3] max-h-[90vh] overflow-y-auto"
       >
-        <div className="space-y-6">
+        <div className="space-y-6 p-4">
           <div>
             <label
               htmlFor="question"
@@ -346,7 +346,7 @@ export default function QuestionsPage() {
             <textarea
               id="answer"
               placeholder="모범 답안을 입력하세요"
-              className={`w-full p-3 border rounded-lg bg-white text-[#2C3639] focus:outline-none focus:ring-2 focus:ring-[#E8AA9B] focus:border-[#E8AA9B] transition-colors h-96 resize-none ${
+              className={`w-full p-3 border rounded-lg bg-white text-[#2C3639] focus:outline-none focus:ring-2 focus:ring-[#E8AA9B] focus:border-[#E8AA9B] transition-colors h-48 resize-none ${
                 errors.answer ? "border-red-500" : "border-[#DED0C3]"
               }`}
               value={formData.answer}
@@ -394,7 +394,7 @@ export default function QuestionsPage() {
             )}
           </div>
 
-          <div className="flex justify-end gap-3 pt-6">
+          <div className="flex justify-end gap-3 pt-4">
             <Button
               variant="outline"
               onClick={handleModalClose}
