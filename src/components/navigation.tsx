@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, BookOpen, Mic } from "lucide-react";
+import { BookOpen, Mic } from "lucide-react";
 
 export function Navigation() {
   const pathname = usePathname();
@@ -12,7 +12,7 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="h-16 flex items-center justify-between">
           <Link
-            href="/"
+            href="/questions"
             className="text-xl md:text-2xl font-bold text-[#2C3639]"
           >
             <span className="bg-gradient-to-r from-[#E8AA9B] to-[#FF7676] bg-clip-text text-transparent">
@@ -21,27 +21,26 @@ export function Navigation() {
           </Link>
           <div className="flex items-center space-x-4">
             <Link
-              href="/"
+              href="/questions"
               className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
-                pathname === "/"
+                pathname === "/questions"
                   ? "bg-[#E8AA9B] text-white"
                   : "text-[#5C6B73] hover:bg-[#FDF8F3]"
               }`}
             >
-              <Home className="h-4 w-4" />
-              <span>홈</span>
-            </Link>
-            <Link
-              href="/questions"
-              className="text-sm md:text-base text-[#5C6B73] hover:text-[#2C3639] transition-colors"
-            >
-              질문 관리
+              <BookOpen className="h-4 w-4" />
+              <span>질문 관리</span>
             </Link>
             <Link
               href="/practice"
-              className="text-sm md:text-base text-[#5C6B73] hover:text-[#2C3639] transition-colors"
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                pathname === "/practice"
+                  ? "bg-[#E8AA9B] text-white"
+                  : "text-[#5C6B73] hover:bg-[#FDF8F3]"
+              }`}
             >
-              실전 연습
+              <Mic className="h-4 w-4" />
+              <span>실전 연습</span>
             </Link>
           </div>
         </div>
