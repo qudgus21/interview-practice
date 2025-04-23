@@ -32,6 +32,8 @@ export default function PracticePage() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
   const [allQuestions, setAllQuestions] = useState<InterviewQuestion[]>([]);
+  const [showRestartModal, setShowRestartModal] = useState(false);
+  const [isRandomOrder, setIsRandomOrder] = useState(true);
 
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
@@ -161,6 +163,24 @@ export default function PracticePage() {
     setShowCategoryModal(false);
   };
 
+  const handleRestartInterview = () => {
+    let filteredQuestions = allQuestions;
+    if (selectedCategories.length < categories.length) {
+      filteredQuestions = allQuestions.filter((q) =>
+        selectedCategories.includes(q.category)
+      );
+    }
+    const questionsToUse = isRandomOrder
+      ? [...filteredQuestions].sort(() => Math.random() - 0.5)
+      : filteredQuestions;
+    setQuestions(questionsToUse);
+    setCurrentIndex(0);
+    setCurrentQuestion(questionsToUse[0]?.question || "");
+    setShowAnswer(false);
+    resetPractice();
+    setShowRestartModal(false);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FDF8F3]">
@@ -218,6 +238,14 @@ export default function PracticePage() {
                 <span className="text-sm text-[#5C6B73]">
                   ({selectedCategories.length}개 선택)
                 </span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowRestartModal(true)}
+                className="flex items-center space-x-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                <span>면접 재시작</span>
               </Button>
               <div className="text-3xl font-bold text-[#2C3639]">
                 {formatTime(timer)}
@@ -407,16 +435,80 @@ export default function PracticePage() {
                       </div>
                     ))}
                   </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleCategoryConfirm}
+                      className={`w-full ${
+                        selectedCategories.length > 0
+                          ? "bg-[#D67D6A] hover:bg-[#C46A57] text-white font-medium shadow-sm"
+                          : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      }`}
+                      disabled={selectedCategories.length === 0}
+                    >
+                      면접 시작하기
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Restart Interview Modal */}
+            {showRestartModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-6 w-full max-w-md">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-semibold text-[#2C3639]">
+                      면접 재시작
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowRestartModal(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-4 mb-6">
+                    <p className="text-[#5C6B73]">
+                      현재 선택된 카테고리의 질문 세트로 면접을 재시작합니다.
+                    </p>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-[#2C3639]">
+                        질문 순서
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant={isRandomOrder ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setIsRandomOrder(true)}
+                          className={`flex-1 ${
+                            isRandomOrder
+                              ? "bg-[#D67D6A] hover:bg-[#C46A57] text-white"
+                              : ""
+                          }`}
+                        >
+                          랜덤 순서
+                        </Button>
+                        <Button
+                          variant={!isRandomOrder ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setIsRandomOrder(false)}
+                          className={`flex-1 ${
+                            !isRandomOrder
+                              ? "bg-[#D67D6A] hover:bg-[#C46A57] text-white"
+                              : ""
+                          }`}
+                        >
+                          정배열
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                   <Button
-                    onClick={handleCategoryConfirm}
-                    className={`w-full ${
-                      selectedCategories.length > 0
-                        ? "bg-[#D67D6A] hover:bg-[#C46A57] text-white font-medium shadow-sm"
-                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    }`}
-                    disabled={selectedCategories.length === 0}
+                    onClick={handleRestartInterview}
+                    className="w-full bg-[#D67D6A] hover:bg-[#C46A57] text-white font-medium shadow-sm"
                   >
-                    면접 시작하기
+                    재시작
                   </Button>
                 </div>
               </div>
