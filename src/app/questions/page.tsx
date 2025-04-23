@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { InterviewQuestion } from "@/types/interview";
+import {
+  InterviewQuestion,
+  Category,
+  generateRandomColor,
+} from "@/types/interview";
 import { Plus, Tag, X } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { Modal } from "@/components/ui/modal";
@@ -24,6 +28,7 @@ import {
 } from "@dnd-kit/sortable";
 
 export default function QuestionsPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +44,7 @@ export default function QuestionsPage() {
     answer: "",
     category: "",
   });
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
@@ -55,13 +60,21 @@ export default function QuestionsPage() {
   );
 
   useEffect(() => {
+    setIsMounted(true);
     const savedQuestions = localStorage.getItem("interviewQuestions");
     const savedCategories = localStorage.getItem("interviewCategories");
+
     if (savedQuestions) {
       setQuestions(JSON.parse(savedQuestions));
     }
     if (savedCategories) {
-      setCategories(JSON.parse(savedCategories));
+      const parsedCategories = JSON.parse(savedCategories);
+      setCategories(
+        parsedCategories.map((name: string) => ({
+          name,
+          color: generateRandomColor([]),
+        }))
+      );
     }
   }, []);
 
@@ -70,9 +83,12 @@ export default function QuestionsPage() {
     localStorage.setItem("interviewQuestions", JSON.stringify(newQuestions));
   };
 
-  const saveCategories = (newCategories: string[]) => {
+  const saveCategories = (newCategories: Category[]) => {
     setCategories(newCategories);
-    localStorage.setItem("interviewCategories", JSON.stringify(newCategories));
+    localStorage.setItem(
+      "interviewCategories",
+      JSON.stringify(newCategories.map((category) => category.name))
+    );
   };
 
   const handleEditQuestion = (question: InterviewQuestion) => {
@@ -145,19 +161,28 @@ export default function QuestionsPage() {
   };
 
   const addCategory = () => {
-    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-      const updatedCategories = [newCategory.trim(), ...categories];
-      saveCategories(updatedCategories);
+    if (
+      newCategory.trim() &&
+      !categories.some((c) => c.name === newCategory.trim())
+    ) {
+      const newCategories = [
+        {
+          name: newCategory.trim(),
+          color: generateRandomColor(categories.map((c) => c.color)),
+        },
+        ...categories,
+      ];
+      saveCategories(newCategories);
       setNewCategory("");
     }
   };
 
-  const deleteCategory = (category: string) => {
-    const updatedCategories = categories.filter((c) => c !== category);
+  const deleteCategory = (categoryName: string) => {
+    const updatedCategories = categories.filter((c) => c.name !== categoryName);
     saveCategories(updatedCategories);
     // 해당 카테고리의 질문들의 카테고리를 빈 문자열로 설정
     const updatedQuestions = questions.map((q) =>
-      q.category === category ? { ...q, category: "" } : q
+      q.category === categoryName ? { ...q, category: "" } : q
     );
     saveQuestions(updatedQuestions);
   };
@@ -177,6 +202,10 @@ export default function QuestionsPage() {
   const filteredQuestions = questions.filter(
     (q) => categoryFilter === "all" || q.category === categoryFilter
   );
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[#FDF8F3]">
@@ -214,10 +243,11 @@ export default function QuestionsPage() {
                   options={[
                     { value: "all", label: "전체 카테고리" },
                     ...categories.map((category) => ({
-                      value: category,
-                      label: category,
+                      value: category.name,
+                      label: category.name,
                     })),
                   ]}
+                  className="w-[200px]"
                 />
               </div>
             </div>
@@ -353,8 +383,8 @@ export default function QuestionsPage() {
             >
               <option value="">카테고리 선택</option>
               {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
+                <option key={category.name} value={category.name}>
+                  {category.name}
                 </option>
               ))}
             </select>
@@ -411,14 +441,14 @@ export default function QuestionsPage() {
           <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
             {categories.map((category) => (
               <div
-                key={category}
+                key={category.name}
                 className="flex items-center justify-between p-2 bg-white rounded-lg border border-[#DED0C3]"
               >
-                <span className="text-[#2C3639]">{category}</span>
+                <span className="text-[#2C3639]">{category.name}</span>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => deleteCategory(category)}
+                  onClick={() => deleteCategory(category.name)}
                   className="text-[#5C6B73] hover:text-red-500"
                 >
                   <X className="h-4 w-4" />

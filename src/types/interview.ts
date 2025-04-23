@@ -18,7 +18,7 @@ export interface InterviewSession {
 
 export interface Category {
   name: string;
-  color: CategoryColor;
+  color: string;
 }
 
 export const CATEGORY_COLORS = [
@@ -35,3 +35,22 @@ export const CATEGORY_COLORS = [
 ] as const;
 
 export type CategoryColor = (typeof CATEGORY_COLORS)[number];
+
+export function generateRandomColor(usedColors: string[]): string {
+  // 사용 가능한 색상 중에서 선택
+  const availableColors = CATEGORY_COLORS.filter(
+    (color) => !usedColors.includes(color)
+  );
+
+  if (availableColors.length > 0) {
+    // 사용 가능한 색상이 있으면 그 중에서 선택
+    // 결정론적인 방식으로 색상 선택
+    const index = usedColors.length % availableColors.length;
+    return availableColors[index];
+  }
+
+  // 모든 색상이 사용 중이면 새로운 색상 생성
+  // 결정론적인 방식으로 색상 생성
+  const hue = (usedColors.length * 137.508) % 360; // 황금각을 사용하여 색상 분포 개선
+  return `hsl(${hue}, 30%, 45%)`;
+}
