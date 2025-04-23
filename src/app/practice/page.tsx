@@ -30,6 +30,7 @@ export default function PracticePage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
 
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
@@ -152,6 +153,14 @@ export default function PracticePage() {
     setSelectedCategories([]);
   };
 
+  const handleComplete = () => {
+    setShowCompletion(true);
+    // 3초 후에 홈으로 이동
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 3000);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FDF8F3]">
@@ -227,13 +236,21 @@ export default function PracticePage() {
                   <div className="text-sm text-[#5C6B73]">
                     {currentIndex + 1} / {questions.length}
                   </div>
-                  <Button
-                    onClick={nextQuestion}
-                    className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
-                    disabled={currentIndex >= questions.length - 1}
-                  >
-                    다음 질문
-                  </Button>
+                  {currentIndex < questions.length - 1 ? (
+                    <Button
+                      onClick={nextQuestion}
+                      className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
+                    >
+                      다음 질문
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleComplete}
+                      className="bg-[#4CAF50] hover:bg-[#45a049] text-white"
+                    >
+                      면접 완료
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -303,6 +320,43 @@ export default function PracticePage() {
                 </div>
               </div>
             </div>
+
+            {/* Completion Animation */}
+            {showCompletion && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-8 max-w-md w-full text-center animate-bounce">
+                  <div className="mb-6">
+                    <div className="w-20 h-20 bg-[#4CAF50] rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                      <svg
+                        className="w-12 h-12 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                    <h2 className="text-3xl font-bold text-[#2C3639] mb-2">
+                      면접 완료!
+                    </h2>
+                    <p className="text-[#5C6B73]">
+                      수고하셨습니다. 홈으로 이동합니다...
+                    </p>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-[#4CAF50] h-2.5 rounded-full animate-progress"
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Category Selection Modal */}
             {showCategoryModal && (
