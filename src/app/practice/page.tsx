@@ -445,8 +445,14 @@ export default function PracticePage() {
 
             {/* Category Selection Modal */}
             {showCategoryModal && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-6 w-full max-w-md">
+              <div
+                className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                onClick={() => setShowCategoryModal(false)}
+              >
+                <div
+                  className="bg-white rounded-lg p-6 w-full max-w-md"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-semibold text-[#2C3639]">
                       카테고리 선택
@@ -511,8 +517,14 @@ export default function PracticePage() {
 
             {/* Restart Interview Modal */}
             {showRestartModal && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-6 w-full max-w-md">
+              <div
+                className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                onClick={() => setShowRestartModal(false)}
+              >
+                <div
+                  className="bg-white rounded-lg p-6 w-full max-w-md"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-semibold text-[#2C3639]">
                       면접 재시작
