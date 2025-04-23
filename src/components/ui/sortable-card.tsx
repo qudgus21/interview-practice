@@ -28,7 +28,7 @@ export function SortableCard({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || "transform 100ms ease",
     opacity: isDragging ? 0.5 : 1,
   };
 
@@ -38,7 +38,7 @@ export function SortableCard({
       style={style}
       {...attributes}
       {...listeners}
-      className="p-4 border border-[#DED0C3] rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer h-[180px] flex flex-col hover:border-[#E8AA9B] relative group"
+      className="p-4 border border-[#DED0C3] rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-100 cursor-pointer h-[180px] flex flex-col hover:border-[#E8AA9B] relative group"
       onClick={onClick}
     >
       <div className="flex-1">
