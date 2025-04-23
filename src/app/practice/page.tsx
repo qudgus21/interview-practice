@@ -22,6 +22,7 @@ export default function PracticePage() {
   const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
@@ -52,6 +53,11 @@ export default function PracticePage() {
       setCurrentQuestion(questions[currentIndex].question);
     }
   }, [questions, currentIndex]);
+
+  useEffect(() => {
+    // 음성 인식 지원 여부 확인 후 로딩 상태 변경
+    setIsLoading(false);
+  }, [browserSupportsSpeechRecognition]);
 
   const startRecording = () => {
     setIsRecording(true);
@@ -96,6 +102,21 @@ export default function PracticePage() {
       .toString()
       .padStart(2, "0")}`;
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#FDF8F3]">
+        <Navigation />
+        <div className="container mx-auto p-4 max-w-4xl">
+          <div className="mt-16 text-center">
+            <h1 className="text-2xl font-bold text-[#2C3639] mb-4">
+              음성 인식 지원 여부를 확인 중입니다...
+            </h1>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!browserSupportsSpeechRecognition) {
     return (
