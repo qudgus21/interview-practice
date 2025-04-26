@@ -1,0 +1,11 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/*
+Disallow: /_next/*
+
+# Host
+Host: https://interview-mate.vercel.app
+
+# Sitemaps
+Sitemap: https://interview-mate.vercel.app/sitemap.xml
