@@ -60,17 +60,140 @@ export default function FeedbackPage() {
   }
 
   if (practiceHistory.records.length === 0) {
+    // 더미 데이터
+    const dummyTotalDuration = 1250; // 20분 50초
+    const dummyTotalQuestions = 12;
+    const dummyUniqueQuestions = 8;
+    const dummyAverageTime = 104; // 1분 44초
+    const dummyCategoryDurations = [
+      { name: "자기소개", time: 400 },
+      { name: "지원동기", time: 300 },
+      { name: "장단점", time: 250 },
+      { name: "협업경험", time: 200 },
+      { name: "기타", time: 100 },
+    ];
+    const dummyCategoryAttempts = [
+      { name: "자기소개", value: 3 },
+      { name: "지원동기", value: 2 },
+      { name: "장단점", value: 3 },
+      { name: "협업경험", value: 2 },
+      { name: "기타", value: 2 },
+    ];
+
     return (
       <div className="min-h-screen bg-[#FDF8F3]">
         <Navigation />
-        <div className="container mx-auto p-4 max-w-6xl">
-          <div className="mt-16 text-center">
-            <h1 className="text-2xl font-bold text-[#2C3639] mb-4">
-              연습 기록이 없습니다
-            </h1>
-            <p className="text-[#5C6B73]">
-              면접 연습을 시작하고 피드백을 확인해보세요.
-            </p>
+        <div className="container mx-auto p-4 max-w-4xl">
+          <div className="mt-25">
+            <div className="text-center md:text-left mb-12">
+              <h1 className="text-3xl font-bold text-[#2C3639] mb-2">
+                연습 기록이 없습니다
+              </h1>
+              <p className="text-[#5C6B73] mb-6">
+                아래는 예시 분석 결과입니다. 실전 연습을 시작하고 나만의 기록을
+                만들어보세요!
+              </p>
+              <a
+                href="/practice"
+                className="inline-block bg-[#E8AA9B] hover:bg-[#E09686] text-white font-semibold rounded-lg px-6 py-3 transition-colors shadow-md"
+              >
+                실전 연습 시작하기
+              </a>
+            </div>
+
+            {/* 전체 요약 섹션 (더미) */}
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold text-[#2C3639] mb-6">
+                전체 요약
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                  <h3 className="text-sm font-medium text-[#5C6B73] mb-2">
+                    총 녹음 시간
+                  </h3>
+                  <p className="text-3xl font-bold text-[#2C3639]">
+                    {formatTime(dummyTotalDuration)}
+                  </p>
+                </Card>
+                <Card>
+                  <h3 className="text-sm font-medium text-[#5C6B73] mb-2">
+                    총 응답 문항
+                  </h3>
+                  <p className="text-3xl font-bold text-[#2C3639]">
+                    {dummyUniqueQuestions}개 / {dummyTotalQuestions}회
+                  </p>
+                  <p className="text-sm text-[#5C6B73] mt-1">
+                    (고유 문항 / 총 응답)
+                  </p>
+                </Card>
+                <Card>
+                  <h3 className="text-sm font-medium text-[#5C6B73] mb-2">
+                    평균 응답 시간
+                  </h3>
+                  <p className="text-3xl font-bold text-[#2C3639]">
+                    {formatTime(dummyAverageTime)}
+                  </p>
+                </Card>
+              </div>
+            </section>
+
+            {/* 카테고리 분석 섹션 (더미) */}
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold text-[#2C3639] mb-6">
+                카테고리 분석
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold text-[#2C3639] mb-4">
+                    카테고리별 응답 시간
+                  </h3>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={dummyCategoryDurations}
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis tickFormatter={(value) => formatTime(value)} />
+                        <Tooltip
+                          formatter={(value: number) => formatTime(value)}
+                        />
+                        <Bar dataKey="time" fill="#D67D6A" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </Card>
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold text-[#2C3639] mb-4">
+                    카테고리별 응답 횟수
+                  </h3>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={dummyCategoryAttempts}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={100}
+                          label={(entry) => `${entry.name}: ${entry.value}회`}
+                        >
+                          {dummyCategoryAttempts.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </Card>
+              </div>
+            </section>
           </div>
         </div>
       </div>
