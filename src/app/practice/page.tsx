@@ -46,6 +46,27 @@ export default function PracticePage() {
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
 
+  // 더미 데이터 상태를 컴포넌트 최상단에서 선언
+  const dummyQuestions: InterviewQuestion[] = [
+    {
+      question: "자기소개를 해주세요.",
+      answer: "안녕하세요, 저는 ...",
+      category: "자기소개",
+    },
+    {
+      question: "지원동기는 무엇인가요?",
+      answer: "저는 ... 때문에 지원하게 되었습니다.",
+      category: "지원동기",
+    },
+    {
+      question: "본인의 장단점은 무엇인가요?",
+      answer: "저의 장점은 ... 단점은 ...",
+      category: "장단점",
+    },
+  ];
+  const [dummyIndex, setDummyIndex] = useState(0);
+  const [showDummyAnswer, setShowDummyAnswer] = useState(false);
+
   useEffect(() => {
     const savedQuestions = localStorage.getItem("interviewQuestions");
     const savedCategories = localStorage.getItem("interviewCategories");
@@ -235,6 +256,85 @@ export default function PracticePage() {
     });
     resetPractice();
   };
+
+  // 질문이 없을 때 더미 데이터로 대체
+  if (!isLoading && questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#FDF8F3]">
+        <Navigation />
+        <div className="container mx-auto p-4 max-w-4xl">
+          <div className="mt-25">
+            <div className="text-center md:text-left mb-12">
+              <h1 className="text-2xl md:text-3xl font-bold text-[#2C3639] mb-2">
+                연습할 질문이 없습니다
+              </h1>
+              <p className="text-[#5C6B73] mb-6">
+                아래는 예시 질문입니다. <br />
+                나만의 질문을 추가하려면 <b>질문 관리</b>로 이동해 주세요!
+              </p>
+              <a
+                href="/questions"
+                className="inline-block bg-[#E8AA9B] hover:bg-[#E09686] text-white font-semibold rounded-lg px-6 py-3 transition-colors shadow-md mb-8"
+              >
+                질문 관리로 이동
+              </a>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 mb-6 max-w-xl mx-auto">
+              <h2 className="text-xl font-semibold text-[#2C3639] mb-4">
+                예시 질문
+              </h2>
+              <p className="text-lg text-[#5C6B73] mb-6">
+                {dummyQuestions[dummyIndex].question}
+              </p>
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-[#5C6B73]">
+                  {dummyIndex + 1} / {dummyQuestions.length}
+                </div>
+                {dummyIndex < dummyQuestions.length - 1 ? (
+                  <Button
+                    onClick={() => setDummyIndex(dummyIndex + 1)}
+                    className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
+                  >
+                    다음 질문
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setDummyIndex(0)}
+                    className="bg-[#4CAF50] hover:bg-[#45a049] text-white"
+                  >
+                    처음부터 다시
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 mb-6 max-w-xl mx-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-[#2C3639]">
+                  모범답안
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowDummyAnswer(!showDummyAnswer)}
+                  className="flex items-center space-x-1"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span>모범답안 보기</span>
+                </Button>
+              </div>
+              <div className="min-h-[100px] p-4 bg-[#FDF8F3] rounded-lg border border-[#DED0C3] mb-4">
+                <p className="text-[#5C6B73] whitespace-pre-line">
+                  {showDummyAnswer
+                    ? dummyQuestions[dummyIndex].answer
+                    : "모범답안을 보려면 버튼을 클릭하세요."}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
