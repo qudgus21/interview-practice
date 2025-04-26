@@ -6,7 +6,7 @@ export function Footer() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center py-6">
           <div className="text-[#5C6B73] text-sm">
-            © 2024 Interview Mate. All rights reserved.
+            © Interview Mate. All rights reserved.
           </div>
           <div className="flex items-center text-[#5C6B73] text-sm">
             <Link
