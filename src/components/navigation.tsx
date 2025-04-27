@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Mic, BarChart2, Menu, X } from "lucide-react";
+import { BookOpen, Mic, BarChart2, Menu, X, FileText } from "lucide-react";
 import { useState } from "react";
 
 export function Navigation() {
@@ -24,6 +24,11 @@ export function Navigation() {
       href: "/feedback",
       icon: BarChart2,
       label: "연습 분석",
+    },
+    {
+      href: "/articles",
+      icon: FileText,
+      label: "자료실",
     },
   ];
 
