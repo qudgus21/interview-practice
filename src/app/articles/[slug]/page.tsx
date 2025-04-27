@@ -38,7 +38,7 @@ export default function ArticleDetailPage({ params }: Props) {
     <div className="min-h-screen bg-[#FDF8F3]">
       <Navigation />
       <div className="container mx-auto px-4 py-12 max-w-3xl">
-        <div className="mb-6">
+        <div className="mb-6 mt-15">
           <Link
             href="/articles"
             className="text-[#E8AA9B] hover:underline text-sm font-medium"
