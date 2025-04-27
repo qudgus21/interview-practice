@@ -306,7 +306,7 @@ export default function QuestionsPage() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         title={editingQuestion ? "질문 수정" : "새 질문 추가"}
-        className="max-w-4xl bg-[#FDF8F3] max-h-[90vh] overflow-y-auto"
+        className="max-w-4xl bg-[#FDF8F3] max-h-[70vh] md:max-h-[90vh] overflow-y-auto"
       >
         <div className="space-y-6">
           <div>
