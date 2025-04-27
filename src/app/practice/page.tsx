@@ -42,6 +42,8 @@ export default function PracticePage() {
       return { records: [], lastUpdated: Date.now() };
     }
   );
+  const [isReading, setIsReading] = useState(false);
+  const [isAutoReading, setIsAutoReading] = useState(false);
 
   const {
     transcript,
@@ -170,9 +172,45 @@ export default function PracticePage() {
     setIsPaused(false);
   };
 
+  const readQuestion = () => {
+    console.log("질문 읽기 시작:", { currentQuestion, isReading });
+
+    if (isReading) {
+      window.speechSynthesis.cancel();
+      setIsReading(false);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(currentQuestion);
+    utterance.lang = "ko-KR";
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    utterance.onend = () => {
+      console.log("질문 읽기 완료");
+      setIsReading(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+    setIsReading(true);
+  };
+
+  // 컴포넌트 언마운트 시 음성 중지
+  useEffect(() => {
+    return () => {
+      if (isReading) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [isReading]);
+
   const nextQuestion = () => {
     if (isRecording) {
       stopRecording();
+    }
+    if (isReading) {
+      window.speechSynthesis.cancel();
+      setIsReading(false);
     }
     if (currentIndex < questions.length - 1) {
       const nextIndex = currentIndex + 1;
@@ -244,6 +282,8 @@ export default function PracticePage() {
     const questionsToUse = isRandomOrder
       ? [...filteredQuestions].sort(() => Math.random() - 0.5)
       : filteredQuestions;
+
+    // 상태 업데이트
     setQuestions(questionsToUse);
     setCurrentIndex(0);
     setCurrentQuestion(questionsToUse[0]?.question || "");
@@ -278,21 +318,6 @@ export default function PracticePage() {
     setPracticeHistory(newHistory);
     localStorage.setItem("practiceHistory", JSON.stringify(newHistory));
   }, [currentQuestion, currentIndex, questions, timer, practiceHistory]);
-
-  // 다음 질문으로 넘어갈 때 기록 저장
-  const handleNextQuestion = () => {
-    savePracticeRecord();
-    setCurrentIndex((prev) => {
-      const nextIndex = prev + 1;
-      if (nextIndex < questions.length) {
-        setCurrentQuestion(questions[nextIndex].question);
-        return nextIndex;
-      }
-      setShowCompletion(true);
-      return prev;
-    });
-    resetPractice();
-  };
 
   // 질문이 없을 때 더미 데이터로 대체
   if (!isLoading && questions.length === 0) {
@@ -597,9 +622,29 @@ export default function PracticePage() {
           <div className="relative">
             <div className="w-full">
               <div className="bg-white rounded-xl shadow-sm border border-[#DED0C3] p-6 mb-6">
-                <h2 className="text-xl font-semibold text-[#2C3639] mb-4">
-                  현재 질문
-                </h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold text-[#2C3639]">
+                    현재 질문
+                  </h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={readQuestion}
+                    className="flex items-center space-x-1"
+                  >
+                    {isReading ? (
+                      <>
+                        <Pause className="h-4 w-4" />
+                        <span>읽기 중지</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="h-4 w-4" />
+                        <span>질문 읽기</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
                 <p className="text-lg text-[#5C6B73] mb-6">{currentQuestion}</p>
                 <div className="flex justify-between items-center">
                   <div className="text-sm text-[#5C6B73]">
@@ -607,7 +652,7 @@ export default function PracticePage() {
                   </div>
                   {currentIndex < questions.length - 1 ? (
                     <Button
-                      onClick={handleNextQuestion}
+                      onClick={nextQuestion}
                       className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
                     >
                       다음 질문
@@ -825,35 +870,37 @@ export default function PracticePage() {
                     <p className="text-[#5C6B73]">
                       현재 선택된 카테고리의 질문 세트로 면접을 재시작합니다.
                     </p>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-[#2C3639]">
-                        질문 순서
-                      </p>
-                      <div className="flex gap-2">
-                        <Button
-                          variant={isRandomOrder ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setIsRandomOrder(true)}
-                          className={`flex-1 ${
-                            isRandomOrder
-                              ? "bg-[#D67D6A] hover:bg-[#C46A57] text-white"
-                              : ""
-                          }`}
-                        >
-                          랜덤 순서
-                        </Button>
-                        <Button
-                          variant={!isRandomOrder ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setIsRandomOrder(false)}
-                          className={`flex-1 ${
-                            !isRandomOrder
-                              ? "bg-[#D67D6A] hover:bg-[#C46A57] text-white"
-                              : ""
-                          }`}
-                        >
-                          정배열
-                        </Button>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-[#2C3639]">
+                          질문 순서
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant={isRandomOrder ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setIsRandomOrder(true)}
+                            className={`flex-1 ${
+                              isRandomOrder
+                                ? "bg-[#D67D6A] hover:bg-[#C46A57] text-white"
+                                : ""
+                            }`}
+                          >
+                            랜덤 순서
+                          </Button>
+                          <Button
+                            variant={!isRandomOrder ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setIsRandomOrder(false)}
+                            className={`flex-1 ${
+                              !isRandomOrder
+                                ? "bg-[#D67D6A] hover:bg-[#C46A57] text-white"
+                                : ""
+                            }`}
+                          >
+                            정배열
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
