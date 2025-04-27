@@ -173,21 +173,86 @@ export default function PracticePage() {
   };
 
   const readQuestion = () => {
-    console.log("질문 읽기 시작:", { currentQuestion, isReading });
-
     if (isReading) {
       window.speechSynthesis.cancel();
       setIsReading(false);
       return;
     }
 
+    // 사용 가능한 음성 목록을 가져옵니다
+    const voices = window.speechSynthesis.getVoices();
+
+    // 질문의 언어를 감지합니다 (간단한 휴리스틱)
+    const isKorean = /[\u3131-\uD79D]/.test(currentQuestion); // 한글
+    const isJapanese = /[\u3040-\u309F\u30A0-\u30FF]/.test(currentQuestion); // 히라가나, 가타카나
+    const isChinese = /[\u4E00-\u9FFF]/.test(currentQuestion); // 한자
+    const isEnglish = /[a-zA-Z]/.test(currentQuestion); // 영어
+    const isFrench = /[éèêëàâçîïôûù]/.test(currentQuestion); // 프랑스어 특수문자
+
+    // 언어에 맞는 음성을 찾습니다
+    let preferredVoice;
+    if (isKorean) {
+      // 한국어 음성 우선
+      preferredVoice = voices.find(
+        (voice) =>
+          voice.lang === "ko-KR" ||
+          voice.lang === "ko" ||
+          voice.name.includes("Korean")
+      );
+    } else if (isJapanese) {
+      // 일본어 음성 우선
+      preferredVoice = voices.find(
+        (voice) =>
+          voice.lang === "ja-JP" ||
+          voice.lang === "ja" ||
+          voice.name.includes("Japanese")
+      );
+    } else if (isChinese) {
+      // 중국어 음성 우선
+      preferredVoice = voices.find(
+        (voice) =>
+          voice.lang === "zh-CN" ||
+          voice.lang === "zh-TW" ||
+          voice.lang === "zh" ||
+          voice.name.includes("Chinese")
+      );
+    } else if (isFrench) {
+      // 프랑스어 음성 우선
+      preferredVoice = voices.find(
+        (voice) =>
+          voice.lang === "fr-FR" ||
+          voice.lang === "fr" ||
+          voice.name.includes("French")
+      );
+    } else if (isEnglish) {
+      // 영어 음성 우선
+      preferredVoice = voices.find(
+        (voice) =>
+          voice.lang === "en-US" ||
+          voice.lang === "en-GB" ||
+          voice.name.includes("English")
+      );
+    }
+
+    // 적절한 음성이 없으면 기본 음성을 사용합니다
+    if (!preferredVoice) {
+      preferredVoice = voices.find((voice) => voice.default);
+    }
+
     const utterance = new SpeechSynthesisUtterance(currentQuestion);
-    utterance.lang = "ko-KR";
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
+
+    // 찾은 음성을 사용합니다
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+      utterance.lang = preferredVoice.lang;
+    }
+
+    // 더 자연스러운 음성을 위해 속도와 피치를 조정합니다
+    utterance.rate = 0.9; // 약간 느리게
+    utterance.pitch = 1.0; // 기본 피치
+    utterance.volume = 1.0; // 최대 볼륨
 
     utterance.onend = () => {
-      console.log("질문 읽기 완료");
       setIsReading(false);
     };
 
