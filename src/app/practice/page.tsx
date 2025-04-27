@@ -43,8 +43,12 @@ export default function PracticePage() {
     }
   );
 
-  const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
-    useSpeechRecognition();
+  const {
+    transcript,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    listening,
+  } = useSpeechRecognition();
 
   // 더미 데이터 상태를 컴포넌트 최상단에서 선언
   const dummyQuestions: InterviewQuestion[] = [
@@ -105,18 +109,47 @@ export default function PracticePage() {
     setIsLoading(false);
   }, [browserSupportsSpeechRecognition]);
 
+  // 컴포넌트 언마운트 시 녹음 중지
+  useEffect(() => {
+    return () => {
+      if (isRecording) {
+        stopRecording();
+      }
+    };
+  }, [isRecording]);
+
   const startRecording = () => {
-    setIsRecording(true);
-    setIsPaused(false);
-    // @ts-ignore
-    SpeechRecognition.startListening({ continuous: true });
+    console.log("녹음 시작 시도", {
+      isRecording,
+      listening,
+      currentTime: new Date().toISOString(),
+    });
+    if (!isRecording) {
+      console.log("녹음 시작");
+      // @ts-expect-error SpeechRecognition 타입 정의가 불완전하여 임시로 사용
+      SpeechRecognition.startListening({
+        continuous: true,
+        language: "ko-KR",
+        interimResults: true,
+      });
+      setIsRecording(true);
+      setIsPaused(false);
+    }
   };
 
   const stopRecording = () => {
-    setIsRecording(false);
-    setIsPaused(false);
-    // @ts-ignore
-    SpeechRecognition.stopListening();
+    console.log("녹음 중지 시도", {
+      isRecording,
+      listening,
+      currentTime: new Date().toISOString(),
+    });
+    if (isRecording) {
+      console.log("녹음 중지");
+      // @ts-expect-error SpeechRecognition 타입 정의가 불완전하여 임시로 사용
+      SpeechRecognition.stopListening();
+      setIsRecording(false);
+      setIsPaused(false);
+    }
   };
 
   const togglePause = () => {
@@ -138,11 +171,15 @@ export default function PracticePage() {
   };
 
   const nextQuestion = () => {
+    if (isRecording) {
+      stopRecording();
+    }
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setCurrentQuestion(questions[currentIndex + 1].question);
-      resetPractice();
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      setCurrentQuestion(questions[nextIndex].question);
       setShowAnswer(false);
+      resetTranscript();
     }
   };
 
