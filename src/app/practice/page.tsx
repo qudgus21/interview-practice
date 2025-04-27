@@ -330,6 +330,153 @@ export default function PracticePage() {
                 </p>
               </div>
             </div>
+
+            {/* 페이지 기능 설명 섹션 */}
+            <div className="mt-16 space-y-8">
+              <div className="bg-white p-8 rounded-xl border border-[#DED0C3] shadow-sm hover:shadow-lg transition-all duration-300">
+                <h2 className="text-2xl font-bold text-[#2C3639] mb-6 relative inline-block">
+                  면접 연습 기능
+                  <span className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#E8AA9B] to-[#FDF8F3] rounded-full"></span>
+                </h2>
+
+                <div className="space-y-8">
+                  <div className="group">
+                    <h3 className="text-lg font-semibold text-[#2C3639] mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-[#E8AA9B] rounded-full mr-2 group-hover:scale-150 transition-transform duration-300"></span>
+                      실전 면접 연습
+                    </h3>
+                    <div className="bg-[#FDF8F3] p-4 rounded-lg border border-[#DED0C3] group-hover:border-[#E8AA9B] transition-colors duration-300">
+                      <p className="text-[#5C6B73] leading-relaxed space-y-2">
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                          실제 면접처럼 질문을 보고 답변을 연습할 수 있습니다.
+                        </span>
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                          음성 인식을 통해 답변을 녹음하고 확인할 수 있습니다.
+                        </span>
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                          타이머 기능으로 답변 시간을 관리할 수 있습니다.
+                        </span>
+                      </p>
+                      <div className="mt-4 p-4 bg-white rounded-lg border border-[#DED0C3]">
+                        <h4 className="font-medium text-[#2C3639] mb-2">
+                          예시 사용법:
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex items-start">
+                            <span className="text-[#E8AA9B] mr-2">1.</span>
+                            <span className="text-[#5C6B73]">
+                              질문을 읽고 답변을 준비합니다.
+                            </span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-[#E8AA9B] mr-2">2.</span>
+                            <span className="text-[#5C6B73]">
+                              마이크 버튼을 눌러 답변을 녹음합니다.
+                            </span>
+                          </div>
+                          <div className="flex items-start">
+                            <span className="text-[#E8AA9B] mr-2">3.</span>
+                            <span className="text-[#5C6B73]">
+                              답변 후 모범 답안을 확인하고 피드백을 받습니다.
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="group">
+                    <h3 className="text-lg font-semibold text-[#2C3639] mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-[#E8AA9B] rounded-full mr-2 group-hover:scale-150 transition-transform duration-300"></span>
+                      카테고리별 연습
+                    </h3>
+                    <div className="bg-[#FDF8F3] p-4 rounded-lg border border-[#DED0C3] group-hover:border-[#E8AA9B] transition-colors duration-300">
+                      <p className="text-[#5C6B73] leading-relaxed space-y-2">
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                          원하는 카테고리의 질문만 선택하여 연습할 수 있습니다.
+                        </span>
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                          기술 면접, 인성 면접 등 유형별로 구분하여 연습
+                          가능합니다.
+                        </span>
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                          랜덤 순서로 질문을 섞어 실제 면접처럼 연습할 수
+                          있습니다.
+                        </span>
+                      </p>
+                      <div className="mt-4 grid grid-cols-2 gap-4">
+                        <div className="p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                          <h4 className="font-medium text-[#2C3639]">
+                            기술 면접
+                          </h4>
+                          <p className="text-sm text-[#5C6B73]">
+                            프론트엔드, 백엔드, CS 관련 질문
+                          </p>
+                        </div>
+                        <div className="p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                          <h4 className="font-medium text-[#2C3639]">
+                            인성 면접
+                          </h4>
+                          <p className="text-sm text-[#5C6B73]">
+                            자기소개, 장단점, 지원동기 관련 질문
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="group">
+                    <h3 className="text-lg font-semibold text-[#2C3639] mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-[#E8AA9B] rounded-full mr-2 group-hover:scale-150 transition-transform duration-300"></span>
+                      연습 기록 관리
+                    </h3>
+                    <div className="bg-[#FDF8F3] p-4 rounded-lg border border-[#DED0C3] group-hover:border-[#E8AA9B] transition-colors duration-300">
+                      <p className="text-[#5C6B73] leading-relaxed space-y-2">
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                          각 질문별 연습 기록이 자동으로 저장됩니다.
+                        </span>
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                          답변 시간, 시도 횟수 등 상세한 기록을 확인할 수
+                          있습니다.
+                        </span>
+                        <span className="flex items-center">
+                          <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                          피드백 페이지에서 전체 연습 기록을 확인할 수 있습니다.
+                        </span>
+                      </p>
+                      <div className="mt-4 space-y-3">
+                        <div className="flex items-center p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                          <span className="text-[#E8AA9B] mr-3">⏱️</span>
+                          <span className="text-[#5C6B73]">
+                            각 질문별 답변 시간 기록
+                          </span>
+                        </div>
+                        <div className="flex items-center p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                          <span className="text-[#E8AA9B] mr-3">📊</span>
+                          <span className="text-[#5C6B73]">
+                            카테고리별 연습 통계 확인
+                          </span>
+                        </div>
+                        <div className="flex items-center p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                          <span className="text-[#E8AA9B] mr-3">📈</span>
+                          <span className="text-[#5C6B73]">
+                            연습 진행 상황 모니터링
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
