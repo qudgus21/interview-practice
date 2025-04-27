@@ -278,6 +278,225 @@ export default function QuestionsPage() {
                     </Button>
                   </div>
                 </div>
+
+                {/* 페이지 기능 설명 섹션 */}
+                <div className="mt-16 space-y-8">
+                  <div className="bg-white p-8 rounded-xl border border-[#DED0C3] shadow-sm hover:shadow-lg transition-all duration-300">
+                    <h2 className="text-2xl font-bold text-[#2C3639] mb-6 relative inline-block">
+                      면접 질문 관리 기능
+                      <span className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#E8AA9B] to-[#FDF8F3] rounded-full"></span>
+                    </h2>
+
+                    <div className="space-y-8">
+                      <div className="group">
+                        <h3 className="text-lg font-semibold text-[#2C3639] mb-3 flex items-center">
+                          <span className="w-2 h-2 bg-[#E8AA9B] rounded-full mr-2 group-hover:scale-150 transition-transform duration-300"></span>
+                          질문 추가하기
+                        </h3>
+                        <div className="bg-[#FDF8F3] p-4 rounded-lg border border-[#DED0C3] group-hover:border-[#E8AA9B] transition-colors duration-300">
+                          <p className="text-[#5C6B73] leading-relaxed space-y-2">
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              상단의 '새 질문 추가' 버튼을 클릭하여 새로운 면접
+                              질문을 추가할 수 있습니다.
+                            </span>
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              질문과 함께 모범 답안을 작성하여 저장할 수
+                              있습니다.
+                            </span>
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              카테고리를 지정하여 질문을 체계적으로 관리할 수
+                              있습니다.
+                            </span>
+                          </p>
+                          <div className="mt-4 p-4 bg-white rounded-lg border border-[#DED0C3]">
+                            <h4 className="font-medium text-[#2C3639] mb-2">
+                              예시:
+                            </h4>
+                            <div className="space-y-2">
+                              <div className="flex items-start">
+                                <span className="text-[#E8AA9B] mr-2">•</span>
+                                <span className="text-[#5C6B73]">
+                                  질문: "React의 가상 DOM(Virtual DOM)에 대해
+                                  설명해주세요."
+                                </span>
+                              </div>
+                              <div className="flex items-start">
+                                <span className="text-[#E8AA9B] mr-2">•</span>
+                                <span className="text-[#5C6B73]">
+                                  답변: "가상 DOM은 실제 DOM의 가벼운
+                                  복사본으로, React의 핵심 개념 중
+                                  하나입니다..."
+                                </span>
+                              </div>
+                              <div className="flex items-start">
+                                <span className="text-[#E8AA9B] mr-2">•</span>
+                                <span className="text-[#5C6B73]">
+                                  카테고리: "Frontend"
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="group">
+                        <h3 className="text-lg font-semibold text-[#2C3639] mb-3 flex items-center">
+                          <span className="w-2 h-2 bg-[#E8AA9B] rounded-full mr-2 group-hover:scale-150 transition-transform duration-300"></span>
+                          카테고리 관리
+                        </h3>
+                        <div className="bg-[#FDF8F3] p-4 rounded-lg border border-[#DED0C3] group-hover:border-[#E8AA9B] transition-colors duration-300">
+                          <p className="text-[#5C6B73] leading-relaxed space-y-2">
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              '카테고리 관리' 버튼을 통해 새로운 카테고리를
+                              추가하거나 삭제할 수 있습니다.
+                            </span>
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              각 질문은 하나의 카테고리에 속할 수 있으며,
+                              카테고리별로 질문을 필터링할 수 있습니다.
+                            </span>
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              카테고리는 면접 유형이나 주제별로 구분하여 사용할
+                              수 있습니다.
+                            </span>
+                          </p>
+                          <div className="mt-4 grid grid-cols-2 gap-4">
+                            <div className="p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <h4 className="font-medium text-[#2C3639]">
+                                Frontend
+                              </h4>
+                              <p className="text-sm text-[#5C6B73]">
+                                React, Vue, JavaScript 관련 질문
+                              </p>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <h4 className="font-medium text-[#2C3639]">
+                                Backend
+                              </h4>
+                              <p className="text-sm text-[#5C6B73]">
+                                Node.js, Spring, 데이터베이스 관련 질문
+                              </p>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <h4 className="font-medium text-[#2C3639]">CS</h4>
+                              <p className="text-sm text-[#5C6B73]">
+                                자료구조, 알고리즘, 네트워크 관련 질문
+                              </p>
+                            </div>
+                            <div className="p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <h4 className="font-medium text-[#2C3639]">
+                                인성
+                              </h4>
+                              <p className="text-sm text-[#5C6B73]">
+                                자기소개, 장단점, 지원동기 관련 질문
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="group">
+                        <h3 className="text-lg font-semibold text-[#2C3639] mb-3 flex items-center">
+                          <span className="w-2 h-2 bg-[#E8AA9B] rounded-full mr-2 group-hover:scale-150 transition-transform duration-300"></span>
+                          질문 관리
+                        </h3>
+                        <div className="bg-[#FDF8F3] p-4 rounded-lg border border-[#DED0C3] group-hover:border-[#E8AA9B] transition-colors duration-300">
+                          <p className="text-[#5C6B73] leading-relaxed space-y-2">
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              추가된 질문은 카드 형태로 표시되며, 드래그 앤
+                              드롭으로 순서를 변경할 수 있습니다.
+                            </span>
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              각 질문 카드를 클릭하여 내용을 수정하거나 삭제할
+                              수 있습니다.
+                            </span>
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              상단의 카테고리 필터를 사용하여 특정 카테고리의
+                              질문만 볼 수 있습니다.
+                            </span>
+                          </p>
+                          <div className="mt-4 space-y-3">
+                            <div className="flex items-center p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <span className="text-[#E8AA9B] mr-3">1.</span>
+                              <span className="text-[#5C6B73]">
+                                질문 카드를 드래그하여 중요도 순으로 정렬
+                              </span>
+                            </div>
+                            <div className="flex items-center p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <span className="text-[#E8AA9B] mr-3">2.</span>
+                              <span className="text-[#5C6B73]">
+                                카테고리 필터에서 "Frontend" 선택 시 해당
+                                카테고리의 질문만 표시
+                              </span>
+                            </div>
+                            <div className="flex items-center p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <span className="text-[#E8AA9B] mr-3">3.</span>
+                              <span className="text-[#5C6B73]">
+                                질문 카드 클릭 시 수정 모달이 열려 내용 수정
+                                가능
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="group">
+                        <h3 className="text-lg font-semibold text-[#2C3639] mb-3 flex items-center">
+                          <span className="w-2 h-2 bg-[#E8AA9B] rounded-full mr-2 group-hover:scale-150 transition-transform duration-300"></span>
+                          면접 준비 가이드
+                        </h3>
+                        <div className="bg-[#FDF8F3] p-4 rounded-lg border border-[#DED0C3] group-hover:border-[#E8AA9B] transition-colors duration-300">
+                          <p className="text-[#5C6B73] leading-relaxed space-y-2">
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              기술 면접 준비: 주요 기술 스택과 관련된 질문들을
+                              카테고리별로 정리하여 준비하세요.
+                            </span>
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              인성 면접 준비: 자기소개, 장단점, 지원 동기 등
+                              일반적인 인성 면접 질문들을 준비하세요.
+                            </span>
+                            <span className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-[#E8AA9B] rounded-full mr-2"></span>
+                              실전 연습: 저장된 질문들을 바탕으로 실제 면접처럼
+                              연습해보세요.
+                            </span>
+                          </p>
+                          <div className="mt-4 space-y-3">
+                            <div className="flex items-center p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <span className="text-[#E8AA9B] mr-3">💡</span>
+                              <span className="text-[#5C6B73]">
+                                카테고리별로 질문을 체계적으로 정리하여 준비
+                              </span>
+                            </div>
+                            <div className="flex items-center p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <span className="text-[#E8AA9B] mr-3">📊</span>
+                              <span className="text-[#5C6B73]">
+                                중요도 순으로 질문을 정렬하여 우선순위에 따라
+                                학습
+                              </span>
+                            </div>
+                            <div className="flex items-center p-3 bg-white rounded-lg border border-[#DED0C3] hover:border-[#E8AA9B] transition-colors duration-300">
+                              <span className="text-[#E8AA9B] mr-3">✍️</span>
+                              <span className="text-[#5C6B73]">
+                                모범 답안을 참고하여 자신만의 답변 스타일 개발
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               <DndContext
