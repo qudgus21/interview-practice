@@ -7,7 +7,7 @@ import {
   Category,
   generateRandomColor,
 } from "@/types/interview";
-import { Plus, Tag, X } from "lucide-react";
+import { Plus, Tag, X, Trash2 } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { Modal } from "@/components/ui/modal";
 import { CustomSelect } from "@/components/ui/custom-select";
@@ -47,6 +47,7 @@ export default function QuestionsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState("");
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -76,6 +77,16 @@ export default function QuestionsPage() {
         }))
       );
     }
+  }, []);
+
+  // 모바일 환경 감지
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const saveQuestions = (newQuestions: InterviewQuestion[]) => {

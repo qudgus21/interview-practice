@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { InterviewQuestion, Category } from "@/types/interview";
 import { Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 interface SortableCardProps {
   question: InterviewQuestion;
@@ -60,6 +60,18 @@ export function SortableCard({
     [question.category]
   );
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 모바일 환경 감지
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
     <div
       ref={setNodeRef}
@@ -90,7 +102,11 @@ export function SortableCard({
           {question.question}
         </h3>
       </div>
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div
+        className={`absolute top-2 right-2 ${
+          isMobile ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        } transition-opacity`}
+      >
         <Button
           variant="ghost"
           size="icon"

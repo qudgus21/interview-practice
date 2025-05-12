@@ -3,7 +3,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/navigation";
-import { Mic, MicOff, RotateCcw, Pause, Play, BookOpen, X } from "lucide-react";
+import {
+  Mic,
+  MicOff,
+  RotateCcw,
+  Pause,
+  Play,
+  BookOpen,
+  X,
+  Save,
+  Download,
+} from "lucide-react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -44,6 +54,9 @@ export default function PracticePage() {
   );
   const [isReading, setIsReading] = useState(false);
   const [isAutoReading, setIsAutoReading] = useState(false);
+  const [availableMics, setAvailableMics] = useState<MediaDeviceInfo[]>([]);
+  const [selectedMic, setSelectedMic] = useState<string>("");
+  const [isMobile, setIsMobile] = useState(false);
 
   const {
     transcript,
@@ -72,6 +85,16 @@ export default function PracticePage() {
   ];
   const [dummyIndex, setDummyIndex] = useState(0);
   const [showDummyAnswer, setShowDummyAnswer] = useState(false);
+
+  // 모바일 환경 감지
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const savedQuestions = localStorage.getItem("interviewQuestions");
@@ -120,19 +143,38 @@ export default function PracticePage() {
     };
   }, [isRecording]);
 
+  // 마이크 권한 요청 및 목록 가져오기
+  const requestMicrophonePermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop()); // 권한만 받고 스트림은 중지
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const mics = devices.filter((device) => device.kind === "audioinput");
+      setAvailableMics(mics);
+      if (mics.length > 0) {
+        setSelectedMic(mics[0].deviceId);
+      }
+    } catch (error) {
+      console.error("마이크 접근 권한을 얻는데 실패했습니다:", error);
+      alert(
+        "마이크 접근 권한이 필요합니다. 브라우저 설정에서 권한을 허용해주세요."
+      );
+    }
+  };
+
+  // 마이크 목록 가져오기
+  useEffect(() => {
+    requestMicrophonePermission();
+  }, []);
+
   const startRecording = () => {
-    console.log("녹음 시작 시도", {
-      isRecording,
-      listening,
-      currentTime: new Date().toISOString(),
-    });
     if (!isRecording) {
-      console.log("녹음 시작");
       // @ts-expect-error SpeechRecognition 타입 정의가 불완전하여 임시로 사용
       SpeechRecognition.startListening({
         continuous: true,
         language: "ko-KR",
         interimResults: true,
+        deviceId: selectedMic, // 선택된 마이크 사용
       });
       setIsRecording(true);
       setIsPaused(false);
@@ -753,15 +795,41 @@ export default function PracticePage() {
                     {transcript || "음성 인식 결과가 여기에 표시됩니다."}
                   </p>
                 </div>
-                <div className="flex justify-center gap-4">
+                <div className="flex flex-col sm:flex-row justify-center gap-4">
                   {!isRecording ? (
-                    <Button
-                      onClick={startRecording}
-                      className="bg-[#E8AA9B] hover:bg-[#E09686] text-white"
-                    >
-                      <Mic className="mr-2 h-4 w-4" />
-                      녹음 시작
-                    </Button>
+                    <div className="flex flex-col gap-2 w-full max-w-xs">
+                      {availableMics.length > 0 ? (
+                        <select
+                          value={selectedMic}
+                          onChange={(e) => setSelectedMic(e.target.value)}
+                          className="p-2 border border-[#DED0C3] rounded-lg bg-white w-full"
+                        >
+                          {availableMics.map((mic) => (
+                            <option key={mic.deviceId} value={mic.deviceId}>
+                              {mic.label ||
+                                `마이크 ${mic.deviceId.slice(0, 5)}`}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <Button
+                          onClick={requestMicrophonePermission}
+                          className="bg-[#E8AA9B] hover:bg-[#E09686] text-white w-full"
+                        >
+                          마이크 권한 요청
+                        </Button>
+                      )}
+                      <Button
+                        onClick={startRecording}
+                        className="bg-[#E8AA9B] hover:bg-[#E09686] text-white w-full"
+                        disabled={availableMics.length === 0}
+                      >
+                        <Mic className="mr-2 h-4 w-4" />
+                        {isMobile
+                          ? "녹음 시작 (이어폰 마이크 사용 가능)"
+                          : "녹음 시작"}
+                      </Button>
+                    </div>
                   ) : (
                     <>
                       <Button
@@ -969,12 +1037,16 @@ export default function PracticePage() {
                       </div>
                     </div>
                   </div>
-                  <Button
-                    onClick={handleRestartInterview}
-                    className="w-full bg-[#D67D6A] hover:bg-[#C46A57] text-white font-medium shadow-sm"
-                  >
-                    재시작
-                  </Button>
+                  <div className="flex flex-col sm:flex-row justify-center gap-4">
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      onClick={handleRestartInterview}
+                    >
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      다시 시작
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
