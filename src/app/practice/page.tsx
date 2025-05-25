@@ -3,17 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/navigation";
-import {
-  Mic,
-  MicOff,
-  RotateCcw,
-  Pause,
-  Play,
-  BookOpen,
-  X,
-  Save,
-  Download,
-} from "lucide-react";
+import { Mic, MicOff, RotateCcw, Pause, Play, BookOpen, X } from "lucide-react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -53,7 +43,6 @@ export default function PracticePage() {
     }
   );
   const [isReading, setIsReading] = useState(false);
-  const [isAutoReading, setIsAutoReading] = useState(false);
   const [availableMics, setAvailableMics] = useState<MediaDeviceInfo[]>([]);
   const [selectedMic, setSelectedMic] = useState<string>("");
   const [isMobile, setIsMobile] = useState(false);
@@ -198,10 +187,10 @@ export default function PracticePage() {
 
   const togglePause = () => {
     if (isPaused) {
-      // @ts-ignore
+      // @ts-expect-error SpeechRecognition 타입 정의가 불완전하여 임시로 사용
       SpeechRecognition.startListening({ continuous: true });
     } else {
-      // @ts-ignore
+      // @ts-expect-error SpeechRecognition 타입 정의가 불완전하여 임시로 사용
       SpeechRecognition.stopListening();
     }
     setIsPaused(!isPaused);
